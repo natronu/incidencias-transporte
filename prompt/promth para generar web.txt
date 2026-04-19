@@ -1,0 +1,63 @@
+Quiero que me hagas una aplicación web para la gestión de incidencias de transporte con las agencias que trabajamos. 
+
+Deberás solicitar los datos del transportista o agencia para darlos de alta en el sistema, que además querré mantener con lo cual tendrás que permitir altas, bajas, modificaciones de las agencias.
+
+También quiero poder dar de alta, eliminación, edición los tipos de incidencias (retraso, paquete perdido, dirección incorrecta, etc..) 
+
+También quiero poder dar de alta, eliminación, edición las zonas geográficas (zona norte, zona sur, zona centro, zona noroeste, etc.)
+
+cuando introduzca una nueva incidencia deberás solicitarme los datos de : agencia, albarán, motivo de la incidencia, zonas geográfica, población, tipo de envió, fecha de envió, fecha de recepción, fecha de incidencia. una vez dada de alta la incidencia podré poner los detalles de la incidencia con una descripción del motivo de la incidencia. 
+
+En la pantalla principal del listado de incidencias quiero que me añadas un botón para exportar a Excel. quiero que me lo exportes en un formato corporativo y con un bonito diseño ya que tendré que compartirlo con dirección.
+En la pantalla principal del listado de incidencias quiero poder filtrar por el estado de la incidencia (abierta, en progreso , cerrada) y poder ordenar por todas las columnas del listado.
+
+En la pantalla principal del listado de incidencias, quiero que hagas la paginación para que no se muestren todas las incidencias a la vez. Quiero que el número de incidencias por página sea configurable por los usuarios con el rol administrador, con lo cual tendrás que añadir una nueva sección de configuración a esta aplicación web que solo visible par los usuarios del rol administrador.
+
+En esta sección de configuración quiero también por cambiar el logotipo y color de fondo de mi página web , así como el nombre de mi empresa.
+
+ 
+Además de eso tiene que haber un acceso a  esta web, mediante usuario y contraseña, con lo cual deberás hacer una pantalla para dar de alta los usuarios de esta aplicación. 
+
+Toda la información de mi página web, clientes, listados de incidencias, usuarios, zonas geográficas, empresas de transporte, tipos de incidencia quiero que me lo guardes en una base de datos relacional, usando supabase, que ya he creado una cuenta para poder usar en este proyecto.
+
+Los datos de mi proyecto es:
+
+url: https://rldzhfsordgniatkhxgs.supabase.co 
+
+clave publica: sb_publishable_fjK3_kXSATkNAQg1nhh1QQ_xvXEsPtW
+
+Hazme un diseño corporativo con esta web
+
+
+
+-------------------------
+puedes generarme un script de SQL con varias incidencias de transporte de ejemplo, para que se lo muestre a mis compañeros, y no tener que hacerlo yo a mano. 
+
+Ademas de esto necesito que los usuarios con el rol "Usuario", solo puedan visualizar los datos de agencias, tipos de incidencia, incidencias y zonas geográficas y no puedan ni eliminar , ni modificar ni editar los datos ya existentes de estos catalogos, solo podrán visualizarlos.
+
+Además necesito que me modifiques en el apartado de alta de incidencias, un nuevo campo para el código postal. Este nuevo campo, luego me debe aparecer en el listado de incidencias.
+
+Además para el campo de Población, quiero que sea como un buscador de poblaciones, a medida que yo vaya escribiendo las primeras letras de la población, vaya realizando un filtrado para que no sea necesario que la escriba completamente para que me aparezca esa población. Las poblaciones que necesito son de España y Portugal.
+
+______________________________
+
+Quiero poder configurar totalmente el aspecto grafico de mi aplicación: color de fondo de la aplicación, color de botones, color de menús, en definitiva poder elegir todos los colores de mi aplicación. quiero cambiar también los colores de los estados de las incidencia (en progreso, abierta, resuelta)
+
+Quiero en el alta de incidencias que pongas un nuevo campo que se llames "Cliente" de texto libre en el cual donde pueda poner el nombre del cliente. Este nuevo campo debe aparecer en la página de listado de incidencias.
+
+En la Gestión de Incidencias, el campo "Fecha Recepción" cámbiamelo en todas las pantallas, por "Fecha de Entrega".
+
+En la pantalla de gestión de incidencias quiero que me reordenes y añadas y cambies el orden de las columnas. quiero que quede de la siguiente forma: 
+
+- elimíname código no quiero visualizarlo
+- Agencia
+- Albarán
+- motivo cámbiamelo por "Incidencia"
+- Zona
+- Cliente
+- Población
+- Código postal
+- Estado
+- F. Incidencia
+- F. Envío
+- F. Entrega

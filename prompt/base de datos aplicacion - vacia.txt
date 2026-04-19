@@ -1,0 +1,98 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.agencies (
+  id integer NOT NULL DEFAULT nextval('agencies_id_seq'::regclass),
+  name text NOT NULL,
+  contact_name text,
+  phone text,
+  email text,
+  city text,
+  address text,
+  postal_code text,
+  notes text,
+  active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT agencies_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.app_config (
+  id integer NOT NULL DEFAULT nextval('app_config_id_seq'::regclass),
+  company_name text NOT NULL DEFAULT 'Mi Empresa'::text,
+  logo_url text,
+  primary_color text DEFAULT '#1a56db'::text,
+  items_per_page integer DEFAULT 10,
+  updated_at timestamp with time zone DEFAULT now(),
+  colors text,
+  CONSTRAINT app_config_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.app_users (
+  id integer NOT NULL DEFAULT nextval('app_users_id_seq'::regclass),
+  name text NOT NULL,
+  username text NOT NULL UNIQUE,
+  email text NOT NULL UNIQUE,
+  password_hash text NOT NULL,
+  role text NOT NULL DEFAULT 'user'::text CHECK (role = ANY (ARRAY['admin'::text, 'user'::text])),
+  active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT app_users_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.geographic_zones (
+  id integer NOT NULL DEFAULT nextval('geographic_zones_id_seq'::regclass),
+  name text NOT NULL UNIQUE,
+  description text,
+  active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT geographic_zones_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.incident_types (
+  id integer NOT NULL DEFAULT nextval('incident_types_id_seq'::regclass),
+  name text NOT NULL UNIQUE,
+  description text,
+  color text DEFAULT '#1a56db'::text,
+  active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT incident_types_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.incident_updates (
+  id integer NOT NULL DEFAULT nextval('incident_updates_id_seq'::regclass),
+  incident_id integer,
+  user_id integer,
+  user_name text,
+  note text NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT incident_updates_pkey PRIMARY KEY (id),
+  CONSTRAINT incident_updates_incident_id_fkey FOREIGN KEY (incident_id) REFERENCES public.incidents(id),
+  CONSTRAINT incident_updates_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.app_users(id)
+);
+CREATE TABLE public.incidents (
+  id integer NOT NULL DEFAULT nextval('incidents_id_seq'::regclass),
+  incident_code text NOT NULL UNIQUE,
+  agency_id integer,
+  albaran text NOT NULL,
+  incident_type_id integer,
+  zone_id integer,
+  city text,
+  shipment_date date,
+  reception_date date,
+  incident_date date,
+  description text,
+  status text DEFAULT 'open'::text CHECK (status = ANY (ARRAY['open'::text, 'in_progress'::text, 'closed'::text])),
+  created_by integer,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  shipment_type text,
+  postal_code text,
+  client_name text,
+  CONSTRAINT incidents_pkey PRIMARY KEY (id),
+  CONSTRAINT incidents_agency_id_fkey FOREIGN KEY (agency_id) REFERENCES public.agencies(id),
+  CONSTRAINT incidents_incident_type_id_fkey FOREIGN KEY (incident_type_id) REFERENCES public.incident_types(id),
+  CONSTRAINT incidents_zone_id_fkey FOREIGN KEY (zone_id) REFERENCES public.geographic_zones(id),
+  CONSTRAINT incidents_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.app_users(id)
+);
+CREATE TABLE public.shipment_types (
+  id integer NOT NULL DEFAULT nextval('shipment_types_id_seq'::regclass),
+  name text NOT NULL UNIQUE,
+  active boolean DEFAULT true,
+  CONSTRAINT shipment_types_pkey PRIMARY KEY (id)
+);

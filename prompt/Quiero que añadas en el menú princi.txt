@@ -1,0 +1,20 @@
+Quiero que añadas en el menú principal otro apartado que se va a llamar "RFP", RFP significa recogida fuera de plaza.
+
+Quiero que esta nueva pantalla añadas: 
+
+- Nombre del comercial que lo solicita
+- Numero de pedido / albarán
+- Nombre cliente
+- Agencia de transporte 
+- Fecha solicitud recogida
+- Número de seguimiento
+
+Necesito crear el catalogo para la gestión de los comerciales, para gestionar altas y bajas y modificación de los comerciales. Solo el rol administrador podrá realizar estar acciones. Él rol usuario solo podrá visualizar.
+
+Los datos que necesito para el alta de los comerciales son:
+
+- Nombre completo
+- Correo
+- Zona geográfica, está información se tiene que obtener de la tabla "zonas geográficas"
+
+Genérame todas los scrips sql necesarios para gestionar estos nuevos requerimientos
