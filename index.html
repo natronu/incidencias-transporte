@@ -10,7 +10,7 @@
     href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
     rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"
-    integrity="sha512-rdBJGWMACPMf/pFbZIhzBSAKgMLqTBBkAWKCxC9S/iucvf/j0eoJlkKMrgO43HSLH95+IsgvLGQ1p/d0JsyqQ=="
+    integrity="sha512-r22gChDnGvBylk90+2e/ycr3RVrDi8DIOkIGNhJlKfuyQM4tIRAI062MaV8sfjQKYVGjOBaZBOA87z+IhZE9DA=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <style>
     /* ======================================================
@@ -2224,7 +2224,7 @@
           <input type="text" class="form-control" id="com-name" placeholder="Juan García López" maxlength="100" />
         </div>
         <div class="form-group">
-          <label class="form-label">Correo electrónico *</label>
+          <label class="form-label">Correo electrónico</label>
           <input type="email" class="form-control" id="com-email" placeholder="juan@empresa.com" maxlength="100" />
         </div>
       </div>
@@ -3650,7 +3650,7 @@
       const alertEl = document.getElementById('m-user-alert');
       const name = document.getElementById('u-name').value.trim();
       const username = document.getElementById('u-username').value.trim();
-      const email = document.getElementById('u-email').value.trim();
+      const email = document.getElementById('u-email').value.trim() || null;
       const role = document.getElementById('u-role').value;
       const pass = document.getElementById('u-pass').value;
       const pass2 = document.getElementById('u-pass2').value;
@@ -3658,8 +3658,8 @@
       const changingPass = isEdit ? document.getElementById('u-change-pass').checked : true;
 
       // Validations
-      if (!name || !email) {
-        alertEl.innerHTML = '<div class="alert alert-error">⚠️ Nombre y email son obligatorios</div>'; return;
+      if (!name) {
+        alertEl.innerHTML = '<div class="alert alert-error">⚠️ El nombre es obligatorio</div>'; return;
       }
       if (!isEdit && !username) {
         alertEl.innerHTML = '<div class="alert alert-error">⚠️ El nombre de usuario es obligatorio</div>'; return;
@@ -4011,15 +4011,15 @@
     async function saveComercial() {
       const alertEl = document.getElementById('m-comercial-alert');
       const name = document.getElementById('com-name').value.trim();
-      const email = document.getElementById('com-email').value.trim();
+      const email = document.getElementById('com-email').value.trim() || null;
 
       // Collect selected zone IDs from checkboxes
       const selectedZoneIds = Array.from(
         document.querySelectorAll('#com-zones-wrap input[type="checkbox"]:checked')
       ).map(cb => parseInt(cb.value));
 
-      if (!name || !email) {
-        alertEl.innerHTML = '<div class="alert alert-error">⚠️ Nombre y email son obligatorios</div>'; return;
+      if (!name) {
+        alertEl.innerHTML = '<div class="alert alert-error">⚠️ El nombre es obligatorio</div>'; return;
       }
       if (selectedZoneIds.length === 0) {
         alertEl.innerHTML = '<div class="alert alert-error">⚠️ Selecciona al menos una zona geográfica</div>'; return;
