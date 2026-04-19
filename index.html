@@ -774,6 +774,11 @@
       color: #4338ca;
     }
 
+    .badge-editor {
+      background: rgba(16, 185, 129, 0.1);
+      color: #065f46;
+    }
+
     .badge-dot {
       width: 6px;
       height: 6px;
@@ -1371,6 +1376,7 @@
               <div class="user-role-badge" id="s-role">Administrador</div>
             </div>
           </div>
+          <button onclick="openChangePasswordModal()" style="width:100%;margin-top:8px;padding:6px 10px;font-size:12px;background:none;border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:rgba(255,255,255,0.6);cursor:pointer;text-align:left">🔑 Cambiar contraseña</button>
         </div>
       </aside>
 
@@ -1440,7 +1446,7 @@
                 <span class="card-title">Gestión de incidencias</span>
                 <div class="card-actions">
                   <button class="btn btn-excel btn-sm" onclick="exportExcel()">📥 Exportar Excel</button>
-                  <button class="btn btn-primary btn-sm admin-action" onclick="openIncidentModal()">+ Nueva
+                  <button class="btn btn-primary btn-sm write-action" onclick="openIncidentModal()">+ Nueva
                     incidencia</button>
                 </div>
               </div>
@@ -1601,7 +1607,7 @@
                     <input type="text" class="form-control" id="rfp-search" placeholder="Buscar..."
                       oninput="filterRFP()" />
                   </div>
-                  <button class="btn btn-primary btn-sm" onclick="openRFPModal()">+ Nueva RFP</button>
+                  <button class="btn btn-primary btn-sm write-action" onclick="openRFPModal()">+ Nueva RFP</button>
                 </div>
               </div>
               <div class="filters-bar">
@@ -2099,6 +2105,7 @@
           <label class="form-label">Rol *</label>
           <select class="form-control" id="u-role">
             <option value="user">Usuario</option>
+            <option value="editor">Editor</option>
             <option value="admin">Administrador</option>
           </select>
         </div>
@@ -2239,6 +2246,33 @@
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="closeModal('m-comercial')">Cancelar</button>
         <button class="btn btn-primary" onclick="saveComercial()">Guardar comercial</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAMBIAR CONTRASEÑA MODAL -->
+  <div class="modal-overlay" id="m-change-pass">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Cambiar contraseña</span>
+        <button class="modal-close" onclick="closeModal('m-change-pass')">✕</button>
+      </div>
+      <div id="m-change-pass-alert"></div>
+      <div class="form-group">
+        <label class="form-label">Contraseña actual *</label>
+        <input type="password" class="form-control" id="cp-current" placeholder="••••••••" maxlength="100" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nueva contraseña * <span style="font-size:11px;color:var(--text3);font-weight:400">(mínimo 8 caracteres)</span></label>
+        <input type="password" class="form-control" id="cp-new" placeholder="••••••••" maxlength="100" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirmar nueva contraseña *</label>
+        <input type="password" class="form-control" id="cp-confirm" placeholder="••••••••" maxlength="100" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('m-change-pass')">Cancelar</button>
+        <button class="btn btn-primary" onclick="submitChangePassword()">Cambiar contraseña</button>
       </div>
     </div>
   </div>
@@ -2392,20 +2426,33 @@
 
     function _activateApp() {
       applyConfig();
+
+      // Restablecer visibilidad antes de aplicar restricciones del nuevo rol
+      document.querySelectorAll('.admin-only, .admin-action, .write-action').forEach(el => el.style.display = '');
+
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('app-screen').style.display = 'block';
       document.getElementById('s-name').textContent = currentUser.name;
-      document.getElementById('s-role').textContent = currentUser.role === 'admin' ? 'Administrador' : 'Usuario';
+      const roleLabels = { admin: 'Administrador', editor: 'Editor', user: 'Usuario' };
+      document.getElementById('s-role').textContent = roleLabels[currentUser.role] || currentUser.role;
       document.getElementById('s-avatar').textContent = currentUser.name[0].toUpperCase();
-      if (currentUser.role !== 'admin') {
+      if (!isAdmin()) {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.admin-action').forEach(el => el.style.display = 'none');
+        if (isEditor()) {
+          document.querySelectorAll('.editor-visible').forEach(el => el.style.display = '');
+          document.querySelectorAll('.write-action').forEach(el => el.style.display = '');
+        } else {
+          document.querySelectorAll('.write-action').forEach(el => el.style.display = 'none');
+        }
       }
       navTo('dashboard', document.querySelector('.nav-item'));
       hideLoad();
     }
 
     function isAdmin() { return currentUser && currentUser.role === 'admin'; }
+    function isEditor() { return currentUser && currentUser.role === 'editor'; }
+    function canEdit() { return currentUser && (currentUser.role === 'admin' || currentUser.role === 'editor'); }
 
     // ================================================================
     // HELPERS
@@ -2437,10 +2484,41 @@
       currentUser = null;
       sessionStorage.removeItem('sb_access_token');
       sessionStorage.removeItem('sb_user');
-      document.getElementById('login-screen').style.display = 'flex';
+      const ls = document.getElementById('login-screen');
+      ls.style.display = 'flex';
+      ls.style.visibility = 'visible';
       document.getElementById('app-screen').style.display = 'none';
       document.getElementById('l-user').value = '';
       document.getElementById('l-pass').value = '';
+    }
+
+    function openChangePasswordModal() {
+      ['cp-current', 'cp-new', 'cp-confirm'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('m-change-pass-alert').innerHTML = '';
+      openModal('m-change-pass');
+    }
+
+    async function submitChangePassword() {
+      const alertEl = document.getElementById('m-change-pass-alert');
+      const currentPass = document.getElementById('cp-current').value;
+      const newPass = document.getElementById('cp-new').value;
+      const confirmPass = document.getElementById('cp-confirm').value;
+      if (!currentPass || !newPass || !confirmPass) { showAlert(alertEl, 'Completa todos los campos'); return; }
+      if (newPass.length < 8) { showAlert(alertEl, 'La nueva contraseña debe tener al menos 8 caracteres'); return; }
+      if (newPass !== confirmPass) { showAlert(alertEl, 'Las contraseñas nuevas no coinciden'); return; }
+      showLoad('Cambiando contraseña...');
+      try {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/change-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${getAuthToken()}` },
+          body: JSON.stringify({ currentPassword: currentPass, newPassword: newPass })
+        });
+        const data = await res.json();
+        if (!res.ok) { showAlert(alertEl, data.error || 'Error al cambiar la contraseña'); hideLoad(); return; }
+        closeModal('m-change-pass');
+        toast('Contraseña actualizada correctamente');
+      } catch (e) { showAlert(alertEl, 'Error al cambiar la contraseña. Inténtalo de nuevo.'); }
+      hideLoad();
     }
 
     document.getElementById('l-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
@@ -2781,7 +2859,7 @@
     <td>
       <div style="display:flex;gap:4px">
         <button class="btn btn-secondary btn-sm" onclick="viewIncident(${i.id})">Ver</button>
-        ${isAdmin() ? `<button class="btn btn-secondary btn-sm" onclick="openIncidentModal(${i.id})">✏️</button>
+        ${canEdit() ? `<button class="btn btn-secondary btn-sm" onclick="openIncidentModal(${i.id})">✏️</button>
         <button class="btn btn-danger btn-sm js-delete" data-table="incidents" data-id="${i.id}" data-label="la incidencia ${escapeHtml(i.incident_code)}">🗑️</button>` : ''}
       </div>
     </td>
@@ -2811,7 +2889,7 @@
     }
 
     async function openIncidentModal(id = null) {
-      if (!isAdmin() && id) { viewIncident(id); return; }
+      if (!canEdit() && id) { viewIncident(id); return; }
       editId.incident = id;
       document.getElementById('m-incident-title').textContent = id ? 'Editar incidencia' : 'Nueva incidencia';
       document.getElementById('m-incident-alert').innerHTML = '';
@@ -3571,14 +3649,14 @@
       <td>${escapeHtml(u.name)}</td>
       <td><span class="text-mono" style="color:var(--brand)">${escapeHtml(u.username)}</span></td>
       <td>${escapeHtml(u.email)}</td>
-      <td><span class="badge ${u.role === 'admin' ? 'badge-admin' : 'badge-user'}">${u.role === 'admin' ? 'Administrador' : 'Usuario'}</span></td>
+      <td><span class="badge ${u.role === 'admin' ? 'badge-admin' : u.role === 'editor' ? 'badge-editor' : 'badge-user'}">${u.role === 'admin' ? 'Administrador' : u.role === 'editor' ? 'Editor' : 'Usuario'}</span></td>
       <td>${fmtDate(u.created_at)}</td>
       <td>
         <div style="display:flex;gap:4px;align-items:center">
-          <button class="btn btn-secondary btn-sm" onclick="openEditUserModal(${u.id})">✏️ Editar</button>
+          ${isAdmin() ? `<button class="btn btn-secondary btn-sm" onclick="openEditUserModal(${u.id})">✏️ Editar</button>
           ${u.id !== currentUser.id
             ? `<button class="btn btn-danger btn-sm js-delete" data-table="app_users" data-id="${u.id}" data-label="el usuario ${escapeHtml(u.name)}">🗑️</button>`
-            : '<span style="color:var(--text3);font-size:12px">— tú —</span>'}
+            : '<span style="color:var(--text3);font-size:12px">— tú —</span>'}` : '<span style="font-size:11px;color:var(--text3)">Solo lectura</span>'}
         </div>
       </td>
     </tr>`).join('') : `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">Sin usuarios</div></div></td></tr>`;
@@ -3829,8 +3907,8 @@
     <td>
       <div style="display:flex;gap:4px">
         <button class="btn btn-secondary btn-sm" onclick="viewRFP(${r.id})">Ver</button>
-        <button class="btn btn-secondary btn-sm" onclick="openRFPModal(${r.id})">✏️</button>
-        <button class="btn btn-danger btn-sm js-delete" data-table="rfp_requests" data-id="${r.id}" data-label="la RFP de ${escapeHtml(r.order_number || '')}">🗑️</button>
+        ${canEdit() ? `<button class="btn btn-secondary btn-sm" onclick="openRFPModal(${r.id})">✏️</button>
+        <button class="btn btn-danger btn-sm js-delete" data-table="rfp_requests" data-id="${r.id}" data-label="la RFP de ${escapeHtml(r.order_number || '')}">🗑️</button>` : ''}
       </div>
     </td>
   </tr>`).join('') : `<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">🚛</div><div class="empty-title">Sin RFPs registradas</div><div class="empty-desc">Crea la primera recogida fuera de plaza</div></div></td></tr>`;
