@@ -2,6 +2,25 @@
 // UI.JS — helpers de interfaz compartidos
 // ================================================================
 
+function mountConfirmModal(container) {
+  const el = document.createElement('div');
+  el.innerHTML = `<div class="modal-overlay" id="m-confirm">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <span class="modal-title">Confirmar eliminación</span>
+        <button class="modal-close" onclick="closeModal('m-confirm')">✕</button>
+      </div>
+      <p style="color:var(--text2);font-size:14px;margin-bottom:1rem" id="m-confirm-msg">¿Estás seguro de que deseas
+        eliminar este registro? Esta acción no se puede deshacer.</p>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('m-confirm')">Cancelar</button>
+        <button class="btn btn-danger" id="m-confirm-btn">Eliminar</button>
+      </div>
+    </div>
+  </div>`;
+  container.appendChild(el.firstElementChild);
+}
+
 // ================================================================
 // LOADING & TOAST
 // ================================================================

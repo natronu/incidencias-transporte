@@ -2,6 +2,98 @@
 // USERS.JS — gestión de usuarios y cambio de contraseña
 // ================================================================
 
+function mountUsersPage(container) {
+  const el = document.createElement('div');
+  el.innerHTML = `<div id="page-users" class="page">
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Gestión de usuarios</span>
+                <button class="btn btn-primary btn-sm" onclick="openUserModal()">+ Nuevo usuario</button>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Usuario</th>
+                      <th>Email</th>
+                      <th>Rol</th>
+                      <th>Creado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="usr-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>`;
+  container.appendChild(el.firstElementChild);
+}
+
+function mountUserModal(container) {
+  const el = document.createElement('div');
+  el.innerHTML = `<div class="modal-overlay" id="m-user">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="m-user-title">Alta de usuario</span>
+        <button class="modal-close" onclick="closeModal('m-user')">✕</button>
+      </div>
+      <div id="m-user-alert"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nombre completo *</label>
+          <input type="text" class="form-control" id="u-name" placeholder="Ana García" maxlength="100" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Usuario *</label>
+          <input type="text" class="form-control" id="u-username" placeholder="ana.garcia" maxlength="50" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Email *</label>
+          <input type="email" class="form-control" id="u-email" placeholder="ana@empresa.com" maxlength="100" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Rol *</label>
+          <select class="form-control" id="u-role">
+            <option value="user">Usuario</option>
+            <option value="editor">Editor</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+      </div>
+      <div id="u-pass-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"
+          id="u-pass-header">
+          <span style="font-size:13px;font-weight:500;color:var(--text2)" id="u-pass-label">Contraseña *</span>
+          <label id="u-pass-toggle"
+            style="display:none;align-items:center;gap:6px;font-size:12.5px;color:var(--text3);cursor:pointer">
+            <input type="checkbox" id="u-change-pass" onchange="togglePassFields(this.checked)"
+              style="cursor:pointer" />
+            Cambiar contraseña
+          </label>
+        </div>
+        <div id="u-pass-fields" class="form-row">
+          <div class="form-group">
+            <label class="form-label" id="u-pass1-label">Nueva contraseña</label>
+            <input type="password" class="form-control" id="u-pass" placeholder="••••••••" maxlength="100" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirmar contraseña</label>
+            <input type="password" class="form-control" id="u-pass2" placeholder="••••••••" maxlength="100" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('m-user')">Cancelar</button>
+        <button class="btn btn-primary" id="u-save-btn" onclick="saveUser()">Crear usuario</button>
+      </div>
+    </div>
+  </div>`;
+  container.appendChild(el.firstElementChild);
+}
+
 // Cache all users for edit lookup
 let allUsers = [];
 
@@ -98,21 +190,11 @@ async function saveUser() {
   const changingPass = isEdit ? document.getElementById('u-change-pass').checked : true;
 
   // Validations
-  if (!name) {
-    alertEl.innerHTML = '<div class="alert alert-error">⚠️ El nombre es obligatorio</div>'; return;
-  }
-  if (!isEdit && !username) {
-    alertEl.innerHTML = '<div class="alert alert-error">⚠️ El nombre de usuario es obligatorio</div>'; return;
-  }
-  if (!isEdit && !pass) {
-    alertEl.innerHTML = '<div class="alert alert-error">⚠️ La contraseña es obligatoria</div>'; return;
-  }
-  if (changingPass && pass && pass !== pass2) {
-    alertEl.innerHTML = '<div class="alert alert-error">⚠️ Las contraseñas no coinciden</div>'; return;
-  }
-  if (changingPass && pass && pass.length < 6) {
-    alertEl.innerHTML = '<div class="alert alert-error">⚠️ La contraseña debe tener al menos 6 caracteres</div>'; return;
-  }
+  if (!name) { showAlert(alertEl, 'El nombre es obligatorio'); return; }
+  if (!isEdit && !username) { showAlert(alertEl, 'El nombre de usuario es obligatorio'); return; }
+  if (!isEdit && !pass) { showAlert(alertEl, 'La contraseña es obligatoria'); return; }
+  if (changingPass && pass && pass !== pass2) { showAlert(alertEl, 'Las contraseñas no coinciden'); return; }
+  if (changingPass && pass && pass.length < 6) { showAlert(alertEl, 'La contraseña debe tener al menos 6 caracteres'); return; }
 
   showLoad(isEdit ? 'Actualizando usuario...' : 'Creando usuario...');
   try {

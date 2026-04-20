@@ -21,9 +21,30 @@ let rfpPage = 1, rfpSortField = 'pickup_date', rfpSortDir = 'desc';
 document.getElementById('l-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
 // ================================================================
+// MOUNT ALL VIEWS
+// ================================================================
+function mountAllViews() {
+  const pages = document.getElementById('pages-container');
+  const modals = document.getElementById('modals-container');
+  mountDashboardPage(pages);
+  mountIncidentsPage(pages);
+  mountRFPPage(pages);
+  mountCatalogsPages(pages);
+  mountUsersPage(pages);
+  mountConfigPage(pages);
+  mountIncidentModal(modals);
+  mountRFPModal(modals);
+  mountCatalogModals(modals);
+  mountUserModal(modals);
+  mountChangePasswordModal(modals);
+  mountConfirmModal(modals);
+}
+
+// ================================================================
 // INIT
 // ================================================================
 (async () => {
+  mountAllViews();
   const loginScreen = document.getElementById('login-screen');
   loginScreen.style.visibility = 'hidden';
   showLoad('Iniciando aplicación...');

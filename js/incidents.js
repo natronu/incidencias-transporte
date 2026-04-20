@@ -2,6 +2,165 @@
 // INCIDENTS.JS — incidencias
 // ================================================================
 
+function mountIncidentsPage(container) {
+  const el = document.createElement('div');
+  el.innerHTML = `<div id="page-incidents" class="page">
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Gestión de incidencias</span>
+                <div class="card-actions">
+                  <button class="btn btn-excel btn-sm" onclick="exportExcel()">📥 Exportar Excel</button>
+                  <button class="btn btn-primary btn-sm write-action" onclick="openIncidentModal()">+ Nueva
+                    incidencia</button>
+                </div>
+              </div>
+              <div class="filters-bar">
+                <div class="search-wrap">
+                  <span class="search-icon">🔍</span>
+                  <input type="text" class="form-control" id="inc-search" placeholder="Buscar..."
+                    oninput="filterIncidents()" />
+                </div>
+                <select class="form-control filter-select" id="inc-filter-status" onchange="filterIncidents()">
+                  <option value="">Todos los estados</option>
+                  <option value="open">Abierta</option>
+                  <option value="in_progress">En progreso</option>
+                  <option value="closed">Cerrada</option>
+                </select>
+                <select class="form-control filter-select" id="inc-filter-agency" onchange="filterIncidents()">
+                  <option value="">Todas las agencias</option>
+                </select>
+              </div>
+              <div class="table-wrap">
+                <table id="inc-table">
+                  <thead>
+                    <tr>
+                      <th onclick="sortIncidents('agency_name')">Agencia <span class="sort-icon">↕</span></th>
+                      <th onclick="sortIncidents('albaran')">Albarán <span class="sort-icon">↕</span></th>
+                      <th onclick="sortIncidents('incident_type_name')">Incidencia <span class="sort-icon">↕</span></th>
+                      <th onclick="sortIncidents('zone_name')">Zona <span class="sort-icon">↕</span></th>
+                      <th onclick="sortIncidents('client_name')">Cliente <span class="sort-icon">↕</span></th>
+                      <th onclick="sortIncidents('city')">Población <span class="sort-icon">↕</span></th>
+                      <th onclick="sortIncidents('postal_code')">C. Postal <span class="sort-icon">↕</span></th>
+                      <th onclick="sortIncidents('status')">Estado <span class="sort-icon">↕</span></th>
+                      <th onclick="sortIncidents('incident_date')">F. Incidencia <span class="sort-icon">↕</span></th>
+                      <th onclick="sortIncidents('shipment_date')">F. Envío <span class="sort-icon">↕</span></th>
+                      <th onclick="sortIncidents('reception_date')">F. Entrega <span class="sort-icon">↕</span></th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="inc-tbody"></tbody>
+                </table>
+              </div>
+              <div class="pagination">
+                <div class="pagination-info" id="inc-pag-info">—</div>
+                <div class="pagination-controls" id="inc-pag-controls"></div>
+              </div>
+            </div>
+          </div>`;
+  container.appendChild(el.firstElementChild);
+}
+
+function mountIncidentModal(container) {
+  const el = document.createElement('div');
+  el.innerHTML = `<div class="modal-overlay" id="m-incident">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <span class="modal-title" id="m-incident-title">Nueva incidencia</span>
+        <button class="modal-close" onclick="closeModal('m-incident')">✕</button>
+      </div>
+      <div id="m-incident-alert"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Agencia / Transportista *</label>
+          <select class="form-control" id="i-agency"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nº de albarán *</label>
+          <input type="text" class="form-control" id="i-albaran" placeholder="ALB-2024-001" maxlength="50" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tipo de incidencia *</label>
+          <select class="form-control" id="i-type"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipo de envío</label>
+          <select class="form-control" id="i-shiptype">
+            <option value="">Seleccionar...</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Zona geográfica *</label>
+          <select class="form-control" id="i-zone"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Población *</label>
+          <div class="autocomplete-wrap">
+            <input type="text" class="form-control" id="i-city" placeholder="Escribe una población..."
+              autocomplete="off" oninput="citySearch(this.value)" onkeydown="cityKey(event)"
+              onfocus="citySearch(this.value)" />
+            <div class="autocomplete-dropdown" id="city-dropdown"></div>
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Código postal</label>
+          <input type="text" class="form-control" id="i-postal" placeholder="08001" maxlength="10" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cliente</label>
+          <input type="text" class="form-control" id="i-client" placeholder="Nombre del cliente" maxlength="100" />
+        </div>
+      </div>
+      <div class="form-row-3">
+        <div class="form-group">
+          <label class="form-label">Fecha de envío</label>
+          <input type="date" class="form-control" id="i-ship-date" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fecha de entrega</label>
+          <input type="date" class="form-control" id="i-rec-date" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fecha de incidencia *</label>
+          <input type="date" class="form-control" id="i-inc-date" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descripción detallada *</label>
+        <textarea class="form-control" id="i-desc" maxlength="2000"
+          placeholder="Describa el motivo de la incidencia con el máximo detalle posible..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('m-incident')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveIncident()">Guardar incidencia</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="m-detail">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <span class="modal-title" id="m-detail-title">Detalle de incidencia</span>
+        <button class="modal-close" onclick="closeModal('m-detail')">✕</button>
+      </div>
+      <div id="m-detail-body"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('m-detail')">Cerrar</button>
+        <button class="btn btn-warning btn-sm" id="btn-set-progress" onclick="setStatus('in_progress')">🔄 En
+          progreso</button>
+        <button class="btn btn-success btn-sm" id="btn-set-closed" onclick="setStatus('closed')">✓ Resolver</button>
+      </div>
+    </div>
+  </div>`;
+  while (el.firstElementChild) {
+    container.appendChild(el.firstElementChild);
+  }
+}
+
 async function loadIncidents() {
   showLoad('Cargando incidencias...');
   try {
@@ -179,7 +338,7 @@ async function saveIncident() {
   const incDate = document.getElementById('i-inc-date').value;
   const desc = document.getElementById('i-desc').value.trim();
   if (!agencyId || !albaran || !typeId || !zoneId || !city || !incDate || !desc) {
-    alertEl.innerHTML = '<div class="alert alert-error">⚠️ Complete todos los campos obligatorios</div>'; return;
+    showAlert(alertEl, 'Complete todos los campos obligatorios'); return;
   }
   showLoad('Guardando...');
   try {
