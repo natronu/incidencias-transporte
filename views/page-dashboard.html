@@ -1,0 +1,49 @@
+<div id="page-dashboard" class="page active">
+  <div class="stats-grid">
+    <div class="stat-card blue">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-label">Incidencias abiertas</div>
+      <div class="stat-value" id="d-open">—</div>
+      <div class="stat-desc">Pendientes de resolución</div>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-icon">🔄</div>
+      <div class="stat-label">En progreso</div>
+      <div class="stat-value" id="d-prog">—</div>
+      <div class="stat-desc">Siendo gestionadas</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon">✅</div>
+      <div class="stat-label">Cerradas</div>
+      <div class="stat-value" id="d-closed">—</div>
+      <div class="stat-desc">Resueltas con éxito</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-icon">🏢</div>
+      <div class="stat-label">Total agencias</div>
+      <div class="stat-value" id="d-agencies">—</div>
+      <div class="stat-desc">Transportistas activos</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Últimas incidencias registradas</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Agencia</th>
+            <th>Albarán</th>
+            <th>Motivo</th>
+            <th>Estado</th>
+            <th>F. Recogida</th>
+            <th>F. Entrega</th>
+            <th>F. Incidencia</th>
+          </tr>
+        </thead>
+        <tbody id="dash-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>

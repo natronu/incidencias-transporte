@@ -21,38 +21,69 @@ let rfpPage = 1, rfpSortField = 'pickup_date', rfpSortDir = 'desc';
 document.getElementById('l-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
 // ================================================================
-// MOUNT ALL VIEWS
+// VIEW LOADER
 // ================================================================
-function mountAllViews() {
-  const pages = document.getElementById('pages-container');
+async function loadView(url, container) {
+  const html = await fetch(url).then(r => {
+    if (!r.ok) throw new Error(`No se pudo cargar la vista: ${url}`);
+    return r.text();
+  });
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  while (tmp.firstElementChild) container.appendChild(tmp.firstElementChild);
+}
+
+async function mountAllViews() {
+  const pages  = document.getElementById('pages-container');
   const modals = document.getElementById('modals-container');
-  mountDashboardPage(pages);
-  mountIncidentsPage(pages);
-  mountRFPPage(pages);
-  mountCatalogsPages(pages);
-  mountUsersPage(pages);
-  mountConfigPage(pages);
-  mountIncidentModal(modals);
-  mountRFPModal(modals);
-  mountCatalogModals(modals);
-  mountUserModal(modals);
-  mountChangePasswordModal(modals);
-  mountConfirmModal(modals);
+
+  await Promise.all([
+    // Páginas
+    loadView('views/page-dashboard.html',   pages),
+    loadView('views/page-incidents.html',   pages),
+    loadView('views/page-rfp.html',         pages),
+    loadView('views/page-agencies.html',    pages),
+    loadView('views/page-inc-types.html',   pages),
+    loadView('views/page-zones.html',       pages),
+    loadView('views/page-ship-types.html',  pages),
+    loadView('views/page-comerciales.html', pages),
+    loadView('views/page-users.html',       pages),
+    loadView('views/page-config.html',      pages),
+    // Modales
+    loadView('views/modal-incident.html',    modals),
+    loadView('views/modal-rfp.html',         modals),
+    loadView('views/modal-catalogs.html',    modals),
+    loadView('views/modal-user.html',        modals),
+    loadView('views/modal-change-pass.html', modals),
+    loadView('views/modal-confirm.html',     modals),
+  ]);
+
+  // Registrar cierre de modales al hacer clic fuera
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+  });
 }
 
 // ================================================================
 // INIT
 // ================================================================
 (async () => {
-  mountAllViews();
   const loginScreen = document.getElementById('login-screen');
   loginScreen.style.visibility = 'hidden';
   showLoad('Iniciando aplicación...');
 
+  try { await mountAllViews(); } catch (e) {
+    console.error('Error cargando vistas:', e);
+    toast('Error al cargar la interfaz. Recarga la página.', 'error');
+    hideLoad();
+    loginScreen.style.visibility = 'visible';
+    return;
+  }
+
   try { await loadConfig(); } catch (e) { console.warn('Init config load failed:', e); }
 
   const savedToken = sessionStorage.getItem('sb_access_token');
-  const savedUser = sessionStorage.getItem('sb_user');
+  const savedUser  = sessionStorage.getItem('sb_user');
   if (savedToken && savedUser) {
     try {
       const payload = JSON.parse(atob(savedToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));

@@ -1,0 +1,51 @@
+<div id="page-incidents" class="page">
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Gestión de incidencias</span>
+      <div class="card-actions">
+        <button class="btn btn-excel btn-sm" onclick="exportExcel()">📥 Exportar Excel</button>
+        <button class="btn btn-primary btn-sm write-action" onclick="openIncidentModal()">+ Nueva incidencia</button>
+      </div>
+    </div>
+    <div class="filters-bar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="form-control" id="inc-search" placeholder="Buscar..." oninput="filterIncidents()" />
+      </div>
+      <select class="form-control filter-select" id="inc-filter-status" onchange="filterIncidents()">
+        <option value="">Todos los estados</option>
+        <option value="open">Abierta</option>
+        <option value="in_progress">En progreso</option>
+        <option value="closed">Cerrada</option>
+      </select>
+      <select class="form-control filter-select" id="inc-filter-agency" onchange="filterIncidents()">
+        <option value="">Todas las agencias</option>
+      </select>
+    </div>
+    <div class="table-wrap">
+      <table id="inc-table">
+        <thead>
+          <tr>
+            <th onclick="sortIncidents('agency_name')">Agencia <span class="sort-icon">↕</span></th>
+            <th onclick="sortIncidents('albaran')">Albarán <span class="sort-icon">↕</span></th>
+            <th onclick="sortIncidents('incident_type_name')">Incidencia <span class="sort-icon">↕</span></th>
+            <th onclick="sortIncidents('zone_name')">Zona <span class="sort-icon">↕</span></th>
+            <th onclick="sortIncidents('client_name')">Cliente <span class="sort-icon">↕</span></th>
+            <th onclick="sortIncidents('city')">Población <span class="sort-icon">↕</span></th>
+            <th onclick="sortIncidents('postal_code')">C. Postal <span class="sort-icon">↕</span></th>
+            <th onclick="sortIncidents('status')">Estado <span class="sort-icon">↕</span></th>
+            <th onclick="sortIncidents('incident_date')">F. Incidencia <span class="sort-icon">↕</span></th>
+            <th onclick="sortIncidents('shipment_date')">F. Envío <span class="sort-icon">↕</span></th>
+            <th onclick="sortIncidents('reception_date')">F. Entrega <span class="sort-icon">↕</span></th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="inc-tbody"></tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <div class="pagination-info" id="inc-pag-info">—</div>
+      <div class="pagination-controls" id="inc-pag-controls"></div>
+    </div>
+  </div>
+</div>

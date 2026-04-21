@@ -1,0 +1,67 @@
+<div class="modal-overlay" id="m-rfp">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <span class="modal-title" id="m-rfp-title">Nueva RFP</span>
+      <button class="modal-close" onclick="closeModal('m-rfp')">✕</button>
+    </div>
+    <div id="m-rfp-alert"></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Comercial *</label>
+        <select class="form-control" id="rfp-comercial"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nº de pedido / albarán *</label>
+        <input type="text" class="form-control" id="rfp-order" placeholder="PED-2024-001" maxlength="50" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Nombre del cliente *</label>
+        <input type="text" class="form-control" id="rfp-client" placeholder="Empresa Cliente S.L." maxlength="100" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Agencia de transporte *</label>
+        <select class="form-control" id="rfp-agency"></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Zona geográfica *</label>
+        <select class="form-control" id="rfp-zone"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fecha de solicitud de recogida *</label>
+        <input type="date" class="form-control" id="rfp-date" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"></div>
+      <div class="form-group">
+        <label class="form-label">Número de seguimiento</label>
+        <input type="text" class="form-control" id="rfp-tracking" placeholder="1Z999AA10123456784" maxlength="50" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('m-rfp')">Cancelar</button>
+      <button class="btn btn-success btn-sm" id="rfp-btn-finish" onclick="setRFPStatus('finished')" style="display:none">✓ Finalizado</button>
+      <button class="btn btn-warning btn-sm" id="rfp-btn-progress" onclick="setRFPStatus('in_progress')" style="display:none">🔄 En progreso</button>
+      <button class="btn btn-primary" id="rfp-save-btn" onclick="saveRFP()">Guardar RFP</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-rfp-detail">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <span class="modal-title" id="m-rfp-detail-title">Detalle RFP</span>
+      <button class="modal-close" onclick="closeModal('m-rfp-detail')">✕</button>
+    </div>
+    <div id="m-rfp-detail-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('m-rfp-detail')">Cerrar</button>
+      <button class="btn btn-warning btn-sm" id="rfp-detail-btn-progress" onclick="setRFPStatusFromDetail('in_progress')">🔄 En progreso</button>
+      <button class="btn btn-success btn-sm" id="rfp-detail-btn-finish" onclick="setRFPStatusFromDetail('finished')">✓ Finalizado</button>
+    </div>
+  </div>
+</div>

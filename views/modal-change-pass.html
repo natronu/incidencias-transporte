@@ -1,0 +1,25 @@
+<div class="modal-overlay" id="m-change-pass">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Cambiar contraseña</span>
+      <button class="modal-close" onclick="closeModal('m-change-pass')">✕</button>
+    </div>
+    <div id="m-change-pass-alert"></div>
+    <div class="form-group">
+      <label class="form-label">Contraseña actual *</label>
+      <input type="password" class="form-control" id="cp-current" placeholder="••••••••" maxlength="100" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nueva contraseña * <span style="font-size:11px;color:var(--text3);font-weight:400">(mínimo 8 caracteres)</span></label>
+      <input type="password" class="form-control" id="cp-new" placeholder="••••••••" maxlength="100" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirmar nueva contraseña *</label>
+      <input type="password" class="form-control" id="cp-confirm" placeholder="••••••••" maxlength="100" />
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('m-change-pass')">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitChangePassword()">Cambiar contraseña</button>
+    </div>
+  </div>
+</div>
