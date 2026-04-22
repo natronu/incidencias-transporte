@@ -24,6 +24,11 @@
       color: var(--badge-closed-text, #15803d);
     }
 
+    .badge-deleted {
+      background: rgba(239, 68, 68, 0.1);
+      color: #b91c1c;
+    }
+
     .badge-admin {
       background: rgba(168, 85, 247, 0.1);
       color: #7e22ce;

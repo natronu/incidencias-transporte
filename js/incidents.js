@@ -8,8 +8,13 @@
 async function loadIncidents() {
   showLoad('Cargando incidencias...');
   try {
+    let incQuery = '?select=*,agencies(name),incident_types(name,color),geographic_zones(name),shipment_types(name)&order=created_at.desc';
+    if (!isAdmin()) {
+      incQuery += '&status=neq.deleted';
+    }
+
     const [inc, ag, zt] = await Promise.all([
-      sb.query('incidents', '?select=*,agencies(name),incident_types(name,color),geographic_zones(name),shipment_types(name)&order=created_at.desc'),
+      sb.query('incidents', incQuery),
       sb.query('agencies', '?select=id,name&active=eq.true&order=name'),
       sb.query('incident_types', '?select=*&active=eq.true'),
     ]);
@@ -28,6 +33,19 @@ async function loadIncidents() {
     const agSel = document.getElementById('inc-filter-agency');
     agSel.innerHTML = '<option value="">Todas las agencias</option>' + ag.map(a => `<option value="${a.id}">${escapeHtml(a.name)}</option>`).join('');
 
+    // Populate status filter dynamically for admins
+    const statusSel = document.getElementById('inc-filter-status');
+    if (statusSel) {
+      if (isAdmin()) {
+        if (!statusSel.querySelector('option[value="deleted"]')) {
+          statusSel.insertAdjacentHTML('beforeend', '<option value="deleted">Eliminada</option>');
+        }
+      } else {
+        const delOpt = statusSel.querySelector('option[value="deleted"]');
+        if (delOpt) delOpt.remove();
+      }
+    }
+
     filterIncidents();
   } catch (e) { toast('Error: ' + e.message, 'error'); }
   hideLoad();
@@ -41,6 +59,7 @@ function filterIncidents() {
   const dateTo = document.getElementById('inc-filter-date-to')?.value;
   filteredIncidents = allIncidents.filter(i => {
     if (status && i.status !== status) return false;
+    if (!status && i.status === 'deleted') return false;
     if (agencyId && String(i.agency_id) !== agencyId) return false;
     if (dateFrom && i.incident_date && i.incident_date < dateFrom) return false;
     if (dateTo && i.incident_date && i.incident_date > dateTo) return false;
@@ -98,7 +117,7 @@ function renderIncidents() {
     <td>
       <div style="display:flex;gap:4px">
         <button class="btn btn-secondary btn-sm" onclick="viewIncident(${i.id})">Ver</button>
-        ${(isAdmin() || (canEdit() && i.status !== 'closed')) ? `<button class="btn btn-secondary btn-sm" onclick="openIncidentModal(${i.id})">✏️</button>
+        ${(isAdmin() || (canEdit() && i.status !== 'closed')) && i.status !== 'deleted' ? `<button class="btn btn-secondary btn-sm" onclick="openIncidentModal(${i.id})">✏️</button>
         <button class="btn btn-danger btn-sm js-delete" data-table="incidents" data-id="${i.id}" data-label="la incidencia ${escapeHtml(i.incident_code)}">🗑️</button>` : ''}
       </div>
     </td>
@@ -249,8 +268,8 @@ async function viewIncident(id) {
     const inc = allIncidents.find(i => i.id === id) || (await sb.query('incidents', `?id=eq.${id}&select=*,agencies(name),incident_types(name),geographic_zones(name),shipment_types(name)`))[0];
     const updates = await sb.query('incident_updates', `?incident_id=eq.${id}&order=created_at.asc`);
     document.getElementById('m-detail-title').textContent = `Incidencia ${inc.incident_code}`;
-    document.getElementById('btn-set-progress').style.display = (inc.status === 'closed' || !isAdmin()) ? 'none' : '';
-    document.getElementById('btn-set-closed').style.display = (inc.status === 'closed' || !isAdmin()) ? 'none' : '';
+    document.getElementById('btn-set-progress').style.display = (inc.status === 'closed' || inc.status === 'deleted' || !canEdit()) ? 'none' : '';
+    document.getElementById('btn-set-closed').style.display = (inc.status === 'closed' || inc.status === 'deleted' || !canEdit()) ? 'none' : '';
     document.getElementById('m-detail-body').innerHTML = `
       <div class="detail-grid" style="margin-bottom:1rem">
         ${df('Código', `<span class="text-mono" style="color:var(--brand)">${escapeHtml(inc.incident_code)}</span>`)}

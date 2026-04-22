@@ -38,13 +38,14 @@ function statusBadge(s) {
   const map = {
     open: ['badge-open', 'Abierta'],
     in_progress: ['badge-in_progress', 'En progreso'],
-    closed: ['badge-closed', 'Cerrada']
+    closed: ['badge-closed', 'Cerrada'],
+    deleted: ['badge-deleted', 'Eliminada']
   };
   const [cls, label] = map[s] || ['badge-open', s];
   return `<span class="badge ${cls}"><span class="badge-dot"></span>${label}</span>`;
 }
 function statusLabel(s) {
-  return { open: 'Abierta', in_progress: 'En progreso', closed: 'Cerrada' }[s] || s;
+  return { open: 'Abierta', in_progress: 'En progreso', closed: 'Cerrada', deleted: 'Eliminada' }[s] || s;
 }
 function fmtDate(d) {
   if (!d) return '—';
@@ -108,8 +109,10 @@ function confirmDelete(table, id, label) {
             await sb.insert('incident_logs', { incident_id: id, user_id: currentUser.id, user_name: currentUser.name, action: 'ELIMINAR', incident_data: null, previous_data: incToDel });
           } catch (e) { console.warn('No se pudo guardar log de eliminación', e); }
         }
+        await sb.update('incidents', id, { status: 'deleted', updated_at: new Date().toISOString() });
+      } else {
+        await sb.delete(table, id);
       }
-      await sb.delete(table, id);
       toast('Registro eliminado');
       const reloaders = { incidents: loadIncidents, rfp_requests: loadRFP, agencies: loadAgencies, incident_types: loadIncTypes, geographic_zones: loadZones, shipment_types: loadShipTypes, comerciales: loadComerciales, app_users: loadUsers };
       if (reloaders[table]) { if (table === 'incidents') { allIncidents = []; } await reloaders[table](); }
