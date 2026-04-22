@@ -1,0 +1,69 @@
+/* =========== STATS =========== */
+.stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+    }
+
+    .stat-card.blue::before {
+      background: var(--brand);
+    }
+
+    .stat-card.green::before {
+      background: var(--success);
+    }
+
+    .stat-card.amber::before {
+      background: var(--accent);
+    }
+
+    .stat-card.red::before {
+      background: var(--danger);
+    }
+
+    .stat-icon {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .stat-label {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 30px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -1px;
+    }
+
+    .stat-desc {
+      font-size: 12px;
+      color: var(--text3);
+      margin-top: 4px;
+    }
