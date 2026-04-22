@@ -49,6 +49,7 @@ async function mountAllViews() {
     loadView('views/page-comerciales.html', pages),
     loadView('views/page-users.html',       pages),
     loadView('views/page-config.html',      pages),
+    loadView('views/page-log.html',         pages),
     // Modales
     loadView('views/modal-incident.html',    modals),
     loadView('views/modal-rfp.html',         modals),

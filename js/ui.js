@@ -71,7 +71,7 @@ function shadeColor(color, percent) {
 // ================================================================
 // NAVIGATION
 // ================================================================
-const PAGE_TITLES = { dashboard: 'Dashboard', incidents: 'Incidencias', rfp: 'RFP — Recogidas fuera de plaza', agencies: 'Agencias y transportistas', 'inc-types': 'Tipos de incidencia', zones: 'Zonas geográficas', 'ship-types': 'Tipos de envío', comerciales: 'Gestión de comerciales', users: 'Gestión de usuarios', config: 'Configuración' };
+const PAGE_TITLES = { dashboard: 'Dashboard', incidents: 'Incidencias', rfp: 'RFP — Recogidas fuera de plaza', agencies: 'Agencias y transportistas', 'inc-types': 'Tipos de incidencia', zones: 'Zonas geográficas', 'ship-types': 'Tipos de envío', comerciales: 'Gestión de comerciales', users: 'Gestión de usuarios', config: 'Configuración', log: 'Auditoría (Log)' };
 
 function navTo(name, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -79,7 +79,7 @@ function navTo(name, el) {
   document.getElementById('page-' + name).classList.add('active');
   if (el) el.classList.add('active');
   document.getElementById('topbar-title').textContent = PAGE_TITLES[name] || name;
-  const loaders = { dashboard: loadDashboard, incidents: loadIncidents, rfp: loadRFP, agencies: loadAgencies, 'inc-types': loadIncTypes, zones: loadZones, 'ship-types': loadShipTypes, comerciales: loadComerciales, users: loadUsers, config: loadConfigForm };
+  const loaders = { dashboard: loadDashboard, incidents: loadIncidents, rfp: loadRFP, agencies: loadAgencies, 'inc-types': loadIncTypes, zones: loadZones, 'ship-types': loadShipTypes, comerciales: loadComerciales, users: loadUsers, config: loadConfigForm, log: loadLogs };
   if (loaders[name]) loaders[name]();
 }
 
@@ -101,6 +101,14 @@ function confirmDelete(table, id, label) {
     showLoad('Eliminando...');
     closeModal('m-confirm');
     try {
+      if (table === 'incidents') {
+        const incToDel = allIncidents.find(i => i.id == id);
+        if (incToDel) {
+          try {
+            await sb.insert('incident_logs', { incident_id: id, user_id: currentUser.id, user_name: currentUser.name, action: 'ELIMINAR', incident_data: null, previous_data: incToDel });
+          } catch (e) { console.warn('No se pudo guardar log de eliminación', e); }
+        }
+      }
       await sb.delete(table, id);
       toast('Registro eliminado');
       const reloaders = { incidents: loadIncidents, rfp_requests: loadRFP, agencies: loadAgencies, incident_types: loadIncTypes, geographic_zones: loadZones, shipment_types: loadShipTypes, comerciales: loadComerciales, app_users: loadUsers };

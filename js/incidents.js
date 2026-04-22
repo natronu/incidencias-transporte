@@ -215,13 +215,16 @@ async function saveIncident() {
       updated_at: new Date().toISOString()
     };
     if (editId.incident) {
+      const oldInc = allIncidents.find(i => i.id === editId.incident) || {};
       await sb.update('incidents', editId.incident, data);
+      try { await sb.insert('incident_logs', { incident_id: editId.incident, user_id: currentUser.id, user_name: currentUser.name, action: 'MODIFICAR', incident_data: data, previous_data: oldInc }); } catch(e) { console.warn(e); }
       toast('Incidencia actualizada');
     } else {
       const code = await nextIncidentCode();
       const newInc = await sb.insert('incidents', { ...data, incident_code: code, status: 'open', created_by: currentUser.id });
       if (newInc && newInc[0]) {
         await sb.insert('incident_updates', { incident_id: newInc[0].id, user_id: currentUser.id, user_name: currentUser.name, note: firstNote });
+        try { await sb.insert('incident_logs', { incident_id: newInc[0].id, user_id: currentUser.id, user_name: currentUser.name, action: 'CREAR', incident_data: newInc[0] }); } catch(e) { console.warn(e); }
       }
       toast('Incidencia registrada: ' + code);
     }
@@ -365,7 +368,9 @@ async function setStatus(status) {
   if (!id) return;
   showLoad();
   try {
+    const oldInc = allIncidents.find(i => i.id === id) || {};
     await sb.update('incidents', id, { status, updated_at: new Date().toISOString() });
+    try { await sb.insert('incident_logs', { incident_id: id, user_id: currentUser.id, user_name: currentUser.name, action: 'MODIFICAR', incident_data: { status }, previous_data: { status: oldInc.status } }); } catch(e) { console.warn(e); }
     toast('Estado actualizado');
     closeModal('m-detail');
     allIncidents = [];
