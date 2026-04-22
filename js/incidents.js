@@ -266,7 +266,19 @@ async function viewIncident(id) {
       <div class="divider"></div>
       <div class="detail-label" style="margin-bottom:12px">Historial</div>
       <div class="timeline">
-        ${updates.map(u => `<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-text">${escapeHtml(u.note)}</div><div class="timeline-meta">${fmtDateTime(u.created_at)} — ${escapeHtml(u.user_name)}</div></div>`).join('')}
+        ${updates.map(u => `
+        <div class="timeline-item" id="upd-item-${u.id}">
+          <div class="timeline-dot"></div>
+          <div class="timeline-text" id="upd-text-${u.id}">${escapeHtml(u.note)}</div>
+          <div class="timeline-meta">
+            ${fmtDateTime(u.created_at)} — ${escapeHtml(u.user_name)}
+            ${canEdit() ? `
+            <span style="margin-left:8px;display:inline-flex;gap:4px">
+              <button class="btn btn-secondary btn-sm" style="padding:1px 6px;font-size:11px" onclick="startEditUpdate(${u.id})">✏️</button>
+              <button class="btn btn-danger btn-sm" style="padding:1px 6px;font-size:11px" onclick="deleteUpdate(${u.id},${id})">🗑️</button>
+            </span>` : ''}
+          </div>
+        </div>`).join('')}
       </div>` : ''}
       ${inc.description ? `
       <div class="divider"></div>
@@ -292,6 +304,49 @@ async function addUpdate(incidentId) {
     toast('Nota añadida');
     await viewIncident(incidentId);
   } catch (e) { toast('Error: ' + e.message, 'error'); }
+  hideLoad();
+}
+
+function startEditUpdate(updateId) {
+  const textEl = document.getElementById(`upd-text-${updateId}`);
+  if (!textEl) return;
+  const current = textEl.textContent;
+  textEl.innerHTML = `
+    <textarea class="form-control" id="upd-edit-${updateId}" style="min-height:60px;margin-bottom:6px" maxlength="2000">${escapeHtml(current)}</textarea>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-primary btn-sm" onclick="saveEditUpdate(${updateId})">Guardar</button>
+      <button class="btn btn-secondary btn-sm" onclick="cancelEditUpdate(${updateId},'${current.replace(/'/g,"\\'").replace(/\n/g,'\\n')}')">Cancelar</button>
+    </div>`;
+  document.getElementById(`upd-edit-${updateId}`)?.focus();
+}
+
+function cancelEditUpdate(updateId, original) {
+  const textEl = document.getElementById(`upd-text-${updateId}`);
+  if (textEl) textEl.innerHTML = escapeHtml(original.replace(/\\n/g, '\n'));
+}
+
+async function saveEditUpdate(updateId) {
+  const textarea = document.getElementById(`upd-edit-${updateId}`);
+  if (!textarea) return;
+  const text = textarea.value.trim();
+  if (!text) { toast('La anotación no puede estar vacía', 'error'); return; }
+  showLoad('Guardando...');
+  try {
+    await sb.update('incident_updates', updateId, { note: text });
+    toast('Anotación actualizada');
+    await viewIncident(window._viewingIncidentId);
+  } catch (e) { toast('Error al guardar: ' + e.message, 'error'); }
+  hideLoad();
+}
+
+async function deleteUpdate(updateId, incidentId) {
+  if (!confirm('¿Eliminar esta anotación? Esta acción no se puede deshacer.')) return;
+  showLoad('Eliminando...');
+  try {
+    await sb.delete('incident_updates', updateId);
+    toast('Anotación eliminada');
+    await viewIncident(incidentId);
+  } catch (e) { toast('Error al eliminar: ' + e.message, 'error'); }
   hideLoad();
 }
 

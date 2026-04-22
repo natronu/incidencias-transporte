@@ -219,6 +219,26 @@ async function exportExcel() {
       notesHeaders,
     ];
 
+    function wrapNote(text, maxLen = 66) {
+      if (!text) return '';
+      const words = text.split(' ');
+      const lines = [];
+      let line = '';
+      for (const word of words) {
+        if (line.length + (line ? 1 : 0) + word.length > maxLen) {
+          if (line) lines.push(line);
+          // word itself longer than maxLen: hard break it
+          let w = word;
+          while (w.length > maxLen) { lines.push(w.slice(0, maxLen)); w = w.slice(maxLen); }
+          line = w;
+        } else {
+          line = line ? line + ' ' + word : word;
+        }
+      }
+      if (line) lines.push(line);
+      return lines.join('\n');
+    }
+
     let hasNotes = false;
     filteredIncidents.forEach(inc => {
       const updates = updatesByIncident[inc.id] || [];
@@ -233,15 +253,15 @@ async function exportExcel() {
         '', '', ''
       ]);
       updates.forEach(u => {
-        notesRows.push([
-          '',
-          '',
-          '',
-          '',
-          fmtDateTime(u.created_at),
-          u.user_name || '—',
-          u.note || ''
-        ]);
+        const lines = wrapNote(u.note).split('\n');
+        lines.forEach((line, lineIdx) => {
+          notesRows.push([
+            '', '', '', '',
+            lineIdx === 0 ? fmtDateTime(u.created_at) : '',
+            lineIdx === 0 ? (u.user_name || '—') : '',
+            line
+          ]);
+        });
       });
       notesRows.push(['', '', '', '', '', '', '']); // spacer
     });
@@ -284,7 +304,15 @@ async function exportExcel() {
       };
     }
 
-    // Style notes data rows
+    // Style notes data rows + calculate row heights
+    const notesRowHeights = [
+      { hpt: 28 }, // row 0 — title
+      { hpt: 16 }, // row 1 — subtitle
+      { hpt: 6  }, // row 2 — spacer
+      { hpt: 20 }, // row 3 — header
+    ];
+    const LINE_HPT = 14; // points per line at 10pt font
+
     let notesDataStart = 4;
     let rowIdx = notesDataStart;
     filteredIncidents.forEach(inc => {
@@ -300,22 +328,31 @@ async function exportExcel() {
           border: { bottom: { style: 'thin', color: { rgb: 'CBD5E1' } } }
         };
       }
+      notesRowHeights[rowIdx] = { hpt: 18 };
       rowIdx++;
       updates.forEach((u, ui) => {
-        for (let C = 0; C < notesHeaders.length; C++) {
-          const addr = XLSX.utils.encode_cell({ r: rowIdx, c: C });
-          if (!wsNotes[addr]) wsNotes[addr] = { v: '', t: 's' };
-          wsNotes[addr].s = {
-            font: { sz: 10, name: 'Calibri', color: { rgb: C === 6 ? '1E293B' : '475569' } },
-            fill: { fgColor: { rgb: ui % 2 === 0 ? 'FFFFFF' : 'F8FAFC' } },
-            alignment: { vertical: 'top', wrapText: C === 6 },
-            border: { bottom: { style: 'thin', color: { rgb: 'E2E8F0' } } }
-          };
-        }
-        rowIdx++;
+        const lines = wrapNote(u.note).split('\n');
+        lines.forEach((line, lineIdx) => {
+          const isLastLine = lineIdx === lines.length - 1;
+          for (let C = 0; C < notesHeaders.length; C++) {
+            const addr = XLSX.utils.encode_cell({ r: rowIdx, c: C });
+            if (!wsNotes[addr]) wsNotes[addr] = { v: '', t: 's' };
+            wsNotes[addr].s = {
+              font: { sz: 10, name: 'Calibri', color: { rgb: C === 6 ? '1E293B' : '475569' } },
+              fill: { fgColor: { rgb: ui % 2 === 0 ? 'FFFFFF' : 'F8FAFC' } },
+              alignment: { vertical: 'center' },
+              border: isLastLine ? { bottom: { style: 'thin', color: { rgb: 'E2E8F0' } } } : {}
+            };
+          }
+          notesRowHeights[rowIdx] = { hpt: 16 };
+          rowIdx++;
+        });
       });
+      notesRowHeights[rowIdx] = { hpt: 6 };
       rowIdx++; // spacer
     });
+
+    wsNotes['!rows'] = notesRowHeights;
 
     XLSX.utils.book_append_sheet(wb, wsNotes, '💬 Anotaciones');
 

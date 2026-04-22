@@ -22,6 +22,9 @@ async function loadRFP() {
       zone_name: r.geographic_zones?.name || '—',
       status: r.status || 'open',
     }));
+    const rfpActive = allRFPs.filter(r => r.status !== 'finished').length;
+    const badgeRfp = document.getElementById('badge-rfp');
+    if (badgeRfp) badgeRfp.textContent = rfpActive;
     filterRFP();
   } catch (e) { toast('Error: ' + e.message, 'error'); }
   hideLoad();
