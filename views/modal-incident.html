@@ -35,9 +35,8 @@
       <div class="form-group">
         <label class="form-label">Población *</label>
         <div class="autocomplete-wrap">
-          <input type="text" class="form-control" id="i-city" placeholder="Escribe una población..."
-            autocomplete="off" oninput="citySearch(this.value)" onkeydown="cityKey(event)"
-            onfocus="citySearch(this.value)" />
+          <input type="text" class="form-control" id="i-city" placeholder="Escribe una población..." autocomplete="off"
+            oninput="citySearch(this.value)" onkeydown="cityKey(event)" onfocus="citySearch(this.value)" />
           <div class="autocomplete-dropdown" id="city-dropdown"></div>
         </div>
       </div>
@@ -66,10 +65,15 @@
         <input type="date" class="form-control" id="i-inc-date" />
       </div>
     </div>
+    <div class="form-group" id="i-first-note-group">
+      <label class="form-label">Incidencia *</label>
+      <textarea class="form-control" id="i-first-note" maxlength="2000"
+        placeholder="Describe la incidencia ocurrida..."></textarea>
+    </div>
     <div class="form-group">
-      <label class="form-label">Descripción detallada *</label>
+      <label class="form-label">Descripción mercancía</label>
       <textarea class="form-control" id="i-desc" maxlength="2000"
-        placeholder="Describa el motivo de la incidencia con el máximo detalle posible..."></textarea>
+        placeholder="Describe el material que se estaba transportando con el máximo detalle posible..."></textarea>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('m-incident')">Cancelar</button>
@@ -87,7 +91,8 @@
     <div id="m-detail-body"></div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('m-detail')">Cerrar</button>
-      <button class="btn btn-warning btn-sm" id="btn-set-progress" onclick="setStatus('in_progress')">🔄 En progreso</button>
+      <button class="btn btn-warning btn-sm" id="btn-set-progress" onclick="setStatus('in_progress')">🔄 En
+        progreso</button>
       <button class="btn btn-success btn-sm" id="btn-set-closed" onclick="setStatus('closed')">✓ Resolver</button>
     </div>
   </div>

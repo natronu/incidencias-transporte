@@ -37,9 +37,13 @@ function filterIncidents() {
   const q = (document.getElementById('inc-search')?.value || '').toLowerCase();
   const status = document.getElementById('inc-filter-status')?.value;
   const agencyId = document.getElementById('inc-filter-agency')?.value;
+  const dateFrom = document.getElementById('inc-filter-date-from')?.value;
+  const dateTo = document.getElementById('inc-filter-date-to')?.value;
   filteredIncidents = allIncidents.filter(i => {
     if (status && i.status !== status) return false;
     if (agencyId && String(i.agency_id) !== agencyId) return false;
+    if (dateFrom && i.incident_date && i.incident_date < dateFrom) return false;
+    if (dateTo && i.incident_date && i.incident_date > dateTo) return false;
     if (q) {
       const hay = [i.incident_code, i.agency_name, i.albaran, i.incident_type_name, i.zone_name, i.city, i.client_name].join(' ').toLowerCase();
       if (!hay.includes(q)) return false;
@@ -150,9 +154,10 @@ async function openIncidentModal(id = null) {
     }
   } else {
     ['i-agency', 'i-type', 'i-zone', 'i-shiptype'].forEach(f => { const el = document.getElementById(f); if (el) el.value = ''; });
-    ['i-albaran', 'i-city', 'i-postal', 'i-client', 'i-ship-date', 'i-rec-date', 'i-inc-date', 'i-desc'].forEach(f => { const el = document.getElementById(f); if (el) el.value = ''; });
+    ['i-albaran', 'i-city', 'i-postal', 'i-client', 'i-ship-date', 'i-rec-date', 'i-inc-date', 'i-desc', 'i-first-note'].forEach(f => { const el = document.getElementById(f); if (el) el.value = ''; });
     document.getElementById('i-inc-date').value = new Date().toISOString().slice(0, 10);
   }
+  document.getElementById('i-first-note-group').style.display = id ? 'none' : '';
   openModal('m-incident');
 }
 
@@ -181,8 +186,13 @@ async function saveIncident() {
   const city = document.getElementById('i-city').value.trim();
   const incDate = document.getElementById('i-inc-date').value;
   const desc = document.getElementById('i-desc').value.trim();
-  if (!agencyId || !albaran || !typeId || !zoneId || !city || !incDate || !desc) {
+  const isEdit = !!editId.incident;
+  const firstNote = document.getElementById('i-first-note').value.trim();
+  if (!agencyId || !albaran || !typeId || !zoneId || !city || !incDate) {
     showAlert(alertEl, 'Complete todos los campos obligatorios'); return;
+  }
+  if (!isEdit && !firstNote) {
+    showAlert(alertEl, 'El campo Incidencia es obligatorio'); return;
   }
   showLoad('Guardando...');
   try {
@@ -201,7 +211,10 @@ async function saveIncident() {
       toast('Incidencia actualizada');
     } else {
       const code = await nextIncidentCode();
-      await sb.insert('incidents', { ...data, incident_code: code, status: 'open', created_by: currentUser.id });
+      const newInc = await sb.insert('incidents', { ...data, incident_code: code, status: 'open', created_by: currentUser.id });
+      if (newInc && newInc[0]) {
+        await sb.insert('incident_updates', { incident_id: newInc[0].id, user_id: currentUser.id, user_name: currentUser.name, note: firstNote });
+      }
       toast('Incidencia registrada: ' + code);
     }
     closeModal('m-incident');
@@ -244,11 +257,6 @@ async function viewIncident(id) {
         ${df('F. Incidencia', fmtDate(inc.incident_date))}
         ${df('F. Registro', fmtDate(inc.created_at))}
       </div>
-      <div style="margin-bottom:1rem">
-        <div class="detail-label">Descripción</div>
-        <div class="description-box">${escapeHtml(inc.description)}</div>
-      </div>
-      <div class="divider"></div>
       <div style="margin-bottom:0.75rem">
         <div class="detail-label" style="margin-bottom:10px">Añadir nota / actualización</div>
         <textarea class="form-control" id="upd-text" placeholder="Escribe una actualización..." style="min-height:70px"></textarea>
@@ -259,6 +267,12 @@ async function viewIncident(id) {
       <div class="detail-label" style="margin-bottom:12px">Historial</div>
       <div class="timeline">
         ${updates.map(u => `<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-text">${escapeHtml(u.note)}</div><div class="timeline-meta">${fmtDateTime(u.created_at)} — ${escapeHtml(u.user_name)}</div></div>`).join('')}
+      </div>` : ''}
+      ${inc.description ? `
+      <div class="divider"></div>
+      <div style="margin-bottom:1rem">
+        <div class="detail-label">Descripción mercancía</div>
+        <div class="description-box">${escapeHtml(inc.description)}</div>
       </div>` : ''}
     `;
     // Store current incident id for status changes
@@ -271,7 +285,7 @@ async function viewIncident(id) {
 
 async function addUpdate(incidentId) {
   const text = document.getElementById('upd-text')?.value?.trim();
-  if (!text) return;
+  if (!text) { toast('La anotación no puede estar vacía', 'error'); return; }
   showLoad('Guardando nota...');
   try {
     await sb.insert('incident_updates', { incident_id: incidentId, user_id: currentUser.id, user_name: currentUser.name, note: text });
