@@ -98,7 +98,7 @@ function renderIncidents() {
     <td>
       <div style="display:flex;gap:4px">
         <button class="btn btn-secondary btn-sm" onclick="viewIncident(${i.id})">Ver</button>
-        ${canEdit() ? `<button class="btn btn-secondary btn-sm" onclick="openIncidentModal(${i.id})">✏️</button>
+        ${(isAdmin() || (canEdit() && i.status !== 'closed')) ? `<button class="btn btn-secondary btn-sm" onclick="openIncidentModal(${i.id})">✏️</button>
         <button class="btn btn-danger btn-sm js-delete" data-table="incidents" data-id="${i.id}" data-label="la incidencia ${escapeHtml(i.incident_code)}">🗑️</button>` : ''}
       </div>
     </td>
@@ -129,6 +129,14 @@ function renderIncidents() {
 
 async function openIncidentModal(id = null) {
   if (!canEdit() && id) { viewIncident(id); return; }
+  if (id) {
+    const inc = allIncidents.find(i => i.id === id);
+    if (inc && inc.status === 'closed' && !isAdmin()) {
+      toast('Las incidencias cerradas solo pueden ser editadas por un administrador', 'error');
+      viewIncident(id);
+      return;
+    }
+  }
   editId.incident = id;
   document.getElementById('m-incident-title').textContent = id ? 'Editar incidencia' : 'Nueva incidencia';
   document.getElementById('m-incident-alert').innerHTML = '';
@@ -272,7 +280,7 @@ async function viewIncident(id) {
           <div class="timeline-text" id="upd-text-${u.id}">${escapeHtml(u.note)}</div>
           <div class="timeline-meta">
             ${fmtDateTime(u.created_at)} — ${escapeHtml(u.user_name)}
-            ${canEdit() ? `
+            ${isAdmin() ? `
             <span style="margin-left:8px;display:inline-flex;gap:4px">
               <button class="btn btn-secondary btn-sm" style="padding:1px 6px;font-size:11px" onclick="startEditUpdate(${u.id})">✏️</button>
               <button class="btn btn-danger btn-sm" style="padding:1px 6px;font-size:11px" onclick="deleteUpdate(${u.id},${id})">🗑️</button>
@@ -326,6 +334,7 @@ function cancelEditUpdate(updateId, original) {
 }
 
 async function saveEditUpdate(updateId) {
+  if (!isAdmin()) { toast('Solo los administradores pueden modificar anotaciones', 'error'); return; }
   const textarea = document.getElementById(`upd-edit-${updateId}`);
   if (!textarea) return;
   const text = textarea.value.trim();
@@ -340,6 +349,7 @@ async function saveEditUpdate(updateId) {
 }
 
 async function deleteUpdate(updateId, incidentId) {
+  if (!isAdmin()) { toast('Solo los administradores pueden eliminar anotaciones', 'error'); return; }
   if (!confirm('¿Eliminar esta anotación? Esta acción no se puede deshacer.')) return;
   showLoad('Eliminando...');
   try {
