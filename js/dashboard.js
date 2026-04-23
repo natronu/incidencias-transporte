@@ -6,17 +6,16 @@
 async function loadDashboard() {
   showLoad();
   try {
-    const [inc, ag] = await Promise.all([
-      sb.query('incidents', '?select=status&status=neq.deleted'),
-      sb.query('agencies', '?select=id&active=eq.true')
+    const [open, prog, closed, agCount] = await Promise.all([
+      sb.count('incidents', '?select=*&status=eq.open'),
+      sb.count('incidents', '?select=*&status=eq.in_progress'),
+      sb.count('incidents', '?select=*&status=eq.closed'),
+      sb.count('agencies', '?select=*&active=eq.true')
     ]);
-    const open = inc.filter(i => i.status === 'open').length;
-    const prog = inc.filter(i => i.status === 'in_progress').length;
-    const closed = inc.filter(i => i.status === 'closed').length;
     document.getElementById('d-open').textContent = open;
     document.getElementById('d-prog').textContent = prog;
     document.getElementById('d-closed').textContent = closed;
-    document.getElementById('d-agencies').textContent = ag.length;
+    document.getElementById('d-agencies').textContent = agCount;
     document.getElementById('badge-open').textContent = open + prog;
 
     const recent = await sb.query('incidents', '?select=incident_code,albaran,status,shipment_date,reception_date,incident_date,agency_id,incident_type_id,agencies(name),incident_types(name)&status=neq.deleted&order=created_at.desc&limit=8');
