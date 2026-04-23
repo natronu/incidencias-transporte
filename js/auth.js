@@ -20,7 +20,7 @@ async function doLogin() {
   const user = document.getElementById('l-user').value.trim();
   const pass = document.getElementById('l-pass').value;
   const alertEl = document.getElementById('login-alert');
-  if (!user || !pass) { alertEl.innerHTML = '<div class="alert alert-error">⚠️ Completa todos los campos</div>'; return; }
+  if (!user || !pass) { showAlert(alertEl, 'Completa todos los campos'); return; }
   showLoad('Autenticando...');
   try {
     const res = await fetch(`${SUPABASE_URL}/functions/v1/login`, {

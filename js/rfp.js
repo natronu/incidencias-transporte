@@ -2,6 +2,9 @@
 // RFP.JS — RFP (Recogidas fuera de plaza)
 // ================================================================
 
+
+
+
 async function loadRFP() {
   showLoad('Cargando RFPs...');
   try {
@@ -19,6 +22,9 @@ async function loadRFP() {
       zone_name: r.geographic_zones?.name || '—',
       status: r.status || 'open',
     }));
+    const rfpActive = allRFPs.filter(r => r.status !== 'finished').length;
+    const badgeRfp = document.getElementById('badge-rfp');
+    if (badgeRfp) badgeRfp.textContent = rfpActive;
     filterRFP();
   } catch (e) { toast('Error: ' + e.message, 'error'); }
   hideLoad();
@@ -94,7 +100,7 @@ function renderRFP() {
     <td>${escapeHtml(r.agency_name)}</td>
     <td>${escapeHtml(r.zone_name)}</td>
     <td>${fmtDate(r.pickup_date)}</td>
-    <td>${r.tracking_number || '—'}</td>
+    <td>${escapeHtml(r.tracking_number)}</td>
     <td>${rfpStatusBadge(r.status)}</td>
     <td>
       <div style="display:flex;gap:4px">
@@ -176,7 +182,7 @@ async function saveRFP() {
   const zoneId = parseInt(document.getElementById('rfp-zone').value);
   const pickupDate = document.getElementById('rfp-date').value;
   if (!comercialId || !orderNumber || !clientName || !agencyId || !zoneId || !pickupDate) {
-    alertEl.innerHTML = '<div class="alert alert-error">⚠️ Complete todos los campos obligatorios</div>'; return;
+    showAlert(alertEl, 'Complete todos los campos obligatorios'); return;
   }
   showLoad('Guardando...');
   try {

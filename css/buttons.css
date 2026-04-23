@@ -1,0 +1,104 @@
+/* =========== BUTTONS =========== */
+.btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 18px;
+      border-radius: var(--radius);
+      border: 1.5px solid transparent;
+      font-family: var(--font);
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary {
+      background: var(--brand);
+      color: #fff;
+      border-color: var(--brand);
+    }
+
+    .btn-primary:hover {
+      background: var(--brand-hover);
+      border-color: var(--brand-hover);
+      box-shadow: 0 4px 12px rgba(26, 86, 219, 0.3);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text2);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.08);
+      color: var(--danger);
+      border-color: rgba(239, 68, 68, 0.25);
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.15);
+    }
+
+    .btn-success {
+      background: rgba(34, 197, 94, 0.08);
+      color: var(--success);
+      border-color: rgba(34, 197, 94, 0.25);
+    }
+
+    .btn-success:hover {
+      background: rgba(34, 197, 94, 0.15);
+    }
+
+    .btn-warning {
+      background: rgba(245, 158, 11, 0.08);
+      color: var(--warning);
+      border-color: rgba(245, 158, 11, 0.25);
+    }
+
+    .btn-warning:hover {
+      background: rgba(245, 158, 11, 0.15);
+    }
+
+    .btn-excel {
+      background: rgba(34, 197, 94, 0.08);
+      color: #16a34a;
+      border-color: rgba(34, 197, 94, 0.25);
+    }
+
+    .btn-excel:hover {
+      background: rgba(34, 197, 94, 0.15);
+    }
+
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 12.5px;
+    }
+
+    .btn-lg {
+      padding: 11px 24px;
+      font-size: 15px;
+    }
+
+    .btn-full {
+      width: 100%;
+    }
+
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border-radius: 8px;
+    }

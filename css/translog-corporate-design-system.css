@@ -1,0 +1,52 @@
+/* =========== TRANSLOG - CORPORATE DESIGN SYSTEM =========== */
+*,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --brand: #1a56db;
+      --brand-hover: #1748c2;
+      --brand-light: #dbeafe;
+      --brand-dark: #1e3a8a;
+      --accent: #f59e0b;
+      --sidebar-w: 252px;
+      --header-h: 60px;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --info: #06b6d4;
+      --bg: #f0f4f9;
+      --surface: #ffffff;
+      --surface2: #f8fafc;
+      --border: #e2e8f0;
+      --border2: #cbd5e1;
+      --text: #0f172a;
+      --text2: #475569;
+      --text3: #94a3b8;
+      --sidebar-bg: #0f172a;
+      --login-bg: #0f172a;
+      --sidebar-text: #94a3b8;
+      --sidebar-active-bg: rgba(26, 86, 219, 0.15);
+      --sidebar-active-text: #60a5fa;
+      --radius: 10px;
+      --radius-lg: 14px;
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.10);
+      --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.15);
+      --font: 'DM Sans', system-ui, sans-serif;
+      --mono: 'DM Mono', monospace;
+      --transition: 0.18s ease;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+    }

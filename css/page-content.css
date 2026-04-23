@@ -1,0 +1,13 @@
+/* =========== PAGE CONTENT =========== */
+.page-body {
+      padding: 1.5rem;
+      flex: 1;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }

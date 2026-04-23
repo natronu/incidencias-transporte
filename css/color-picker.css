@@ -1,0 +1,16 @@
+/* =========== COLOR PICKER =========== */
+.color-picker-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input[type="color"] {
+      width: 42px;
+      height: 36px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 2px;
+      background: var(--surface);
+    }

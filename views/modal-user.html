@@ -1,0 +1,57 @@
+<div class="modal-overlay" id="m-user">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="m-user-title">Alta de usuario</span>
+      <button class="modal-close" onclick="closeModal('m-user')">✕</button>
+    </div>
+    <div id="m-user-alert"></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Nombre completo *</label>
+        <input type="text" class="form-control" id="u-name" placeholder="Ana García" maxlength="100" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Usuario *</label>
+        <input type="text" class="form-control" id="u-username" placeholder="ana.garcia" maxlength="50" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Email *</label>
+        <input type="email" class="form-control" id="u-email" placeholder="ana@empresa.com" maxlength="100" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Rol *</label>
+        <select class="form-control" id="u-role">
+          <option value="user">Usuario</option>
+          <option value="editor">Editor</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+    </div>
+    <div id="u-pass-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px" id="u-pass-header">
+        <span style="font-size:13px;font-weight:500;color:var(--text2)" id="u-pass-label">Contraseña *</span>
+        <label id="u-pass-toggle"
+          style="display:none;align-items:center;gap:6px;font-size:12.5px;color:var(--text3);cursor:pointer">
+          <input type="checkbox" id="u-change-pass" onchange="togglePassFields(this.checked)" style="cursor:pointer" />
+          Cambiar contraseña
+        </label>
+      </div>
+      <div id="u-pass-fields" class="form-row">
+        <div class="form-group">
+          <label class="form-label" id="u-pass1-label">Nueva contraseña</label>
+          <input type="password" class="form-control" id="u-pass" placeholder="••••••••" maxlength="100" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirmar contraseña</label>
+          <input type="password" class="form-control" id="u-pass2" placeholder="••••••••" maxlength="100" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('m-user')">Cancelar</button>
+      <button class="btn btn-primary" id="u-save-btn" onclick="saveUser()">Crear usuario</button>
+    </div>
+  </div>
+</div>

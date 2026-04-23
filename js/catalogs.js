@@ -2,6 +2,7 @@
 // CATALOGS.JS — agencias, tipos, zonas, envíos, comerciales
 // ================================================================
 
+
 // ================================================================
 // AGENCIES
 // ================================================================
@@ -56,7 +57,7 @@ function openAgencyModal(id = null) {
 async function saveAgency() {
   const alertEl = document.getElementById('m-agency-alert');
   const name = document.getElementById('a-name').value.trim();
-  if (!name) { alertEl.innerHTML = '<div class="alert alert-error">⚠️ El nombre es obligatorio</div>'; return; }
+  if (!name) { showAlert(alertEl, 'El nombre es obligatorio'); return; }
   showLoad('Guardando...');
   try {
     const data = { name, contact_name: document.getElementById('a-contact').value, email: document.getElementById('a-email').value, phone: document.getElementById('a-phone').value.trim() || null, notes: document.getElementById('a-notes').value, updated_at: new Date().toISOString() };
@@ -113,7 +114,7 @@ function openIncTypeModal(id = null) {
 async function saveIncType() {
   const alertEl = document.getElementById('m-inctype-alert');
   const name = document.getElementById('it-name').value.trim();
-  if (!name) { alertEl.innerHTML = '<div class="alert alert-error">⚠️ El nombre es obligatorio</div>'; return; }
+  if (!name) { showAlert(alertEl, 'El nombre es obligatorio'); return; }
   showLoad();
   try {
     const data = { name, description: document.getElementById('it-desc').value, color: document.getElementById('it-color').value };
@@ -168,7 +169,7 @@ function openZoneModal(id = null) {
 async function saveZone() {
   const alertEl = document.getElementById('m-zone-alert');
   const name = document.getElementById('z-name').value.trim();
-  if (!name) { alertEl.innerHTML = '<div class="alert alert-error">⚠️ El nombre es obligatorio</div>'; return; }
+  if (!name) { showAlert(alertEl, 'El nombre es obligatorio'); return; }
   showLoad();
   try {
     const data = { name, description: document.getElementById('z-desc').value };
@@ -229,7 +230,7 @@ function openShipTypeModal(id = null) {
 async function saveShipType() {
   const alertEl = document.getElementById('m-shiptype-alert');
   const name = document.getElementById('st-name').value.trim();
-  if (!name) { alertEl.innerHTML = '<div class="alert alert-error">⚠️ El nombre es obligatorio</div>'; return; }
+  if (!name) { showAlert(alertEl, 'El nombre es obligatorio'); return; }
   showLoad();
   try {
     const data = { name, description: document.getElementById('st-desc').value.trim() };
@@ -300,7 +301,7 @@ async function openComercialModal(id = null) {
     const checked = assignedZoneIds.includes(z.id);
     return `<label class="zone-check-label${checked ? ' checked' : ''}" onclick="toggleZoneCheck(this)">
       <input type="checkbox" value="${z.id}" ${checked ? 'checked' : ''} />
-      ${z.name}
+      ${escapeHtml(z.name)}
     </label>`;
   }).join('');
 
@@ -331,12 +332,8 @@ async function saveComercial() {
     document.querySelectorAll('#com-zones-wrap input[type="checkbox"]:checked')
   ).map(cb => parseInt(cb.value));
 
-  if (!name) {
-    alertEl.innerHTML = '<div class="alert alert-error">⚠️ El nombre es obligatorio</div>'; return;
-  }
-  if (selectedZoneIds.length === 0) {
-    alertEl.innerHTML = '<div class="alert alert-error">⚠️ Selecciona al menos una zona geográfica</div>'; return;
-  }
+  if (!name) { showAlert(alertEl, 'El nombre es obligatorio'); return; }
+  if (selectedZoneIds.length === 0) { showAlert(alertEl, 'Selecciona al menos una zona geográfica'); return; }
 
   showLoad();
   try {
@@ -348,7 +345,7 @@ async function saveComercial() {
       // Delete existing zone assignments and reinsert
       await fetch(`${SUPABASE_URL}/rest/v1/comerciales_zonas?comercial_id=eq.${comercialId}`, {
         method: 'DELETE',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${getAuthToken()}` }
       });
     } else {
       // Insert new comercial

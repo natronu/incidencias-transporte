@@ -1,0 +1,22 @@
+/* =========== EMPTY STATE =========== */
+.empty-state {
+      text-align: center;
+      padding: 3.5rem 1rem;
+      color: var(--text3);
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .empty-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text2);
+      margin-bottom: 6px;
+    }
+
+    .empty-desc {
+      font-size: 13px;
+    }

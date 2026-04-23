@@ -1,0 +1,161 @@
+<div id="page-config" class="page">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+
+    <!-- Identidad -->
+    <div class="config-card">
+      <div class="config-card-title">🏢 Identidad corporativa</div>
+      <div class="form-group">
+        <label class="form-label">Nombre de empresa</label>
+        <input type="text" class="form-control" id="cfg-company" placeholder="Mi Empresa S.L." maxlength="100" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Logotipo de la empresa</label>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <div id="logo-preview-wrap"
+            style="width:64px;height:64px;border-radius:12px;background:var(--surface2);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;transition:border-color 0.2s">
+            <span id="logo-preview-placeholder" style="font-size:26px">🏢</span>
+            <img id="logo-preview-img" src="" alt="Logo"
+              style="display:none;width:100%;height:100%;object-fit:contain;border-radius:10px" />
+          </div>
+          <div style="flex:1;min-width:180px">
+            <input type="file" id="cfg-logo-file" accept=".jpg,.jpeg,.png,.bmp,image/jpeg,image/png,image/bmp"
+              style="display:none" onchange="handleLogoFile(this)" />
+            <button type="button" class="btn btn-secondary"
+              onclick="document.getElementById('cfg-logo-file').click()" style="width:100%;margin-bottom:8px">
+              📁 Seleccionar imagen…
+            </button>
+            <div id="logo-file-name" style="font-size:12px;color:var(--text3)">Formatos: JPG, JPEG, PNG, BMP · Máx. 1 MB</div>
+            <button type="button" id="logo-clear-btn" onclick="clearLogo()"
+              style="display:none;margin-top:6px;font-size:12px;color:var(--danger);background:none;border:none;cursor:pointer;padding:0">✕ Eliminar logotipo</button>
+          </div>
+        </div>
+        <input type="hidden" id="cfg-logo" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Incidencias por página</label>
+        <select class="form-control" id="cfg-pagesize">
+          <option value="5">5 registros</option>
+          <option value="10">10 registros</option>
+          <option value="20">20 registros</option>
+          <option value="50">50 registros</option>
+          <option value="100">100 registros</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Colores interfaz -->
+    <div class="config-card">
+      <div class="config-card-title">🎨 Colores de la interfaz</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="form-group">
+          <label class="form-label">Color de fondo</label>
+          <div class="color-picker-wrap">
+            <input type="color" id="cfg-bg" oninput="liveColor('--bg',this.value)" />
+            <input type="text" class="form-control" id="cfg-bg-hex" style="width:90px" oninput="syncHex('cfg-bg',this.value,'--bg')" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sidebar / menú</label>
+          <div class="color-picker-wrap">
+            <input type="color" id="cfg-sidebar" oninput="liveColor('--sidebar-bg',this.value)" />
+            <input type="text" class="form-control" id="cfg-sidebar-hex" style="width:90px" oninput="syncHex('cfg-sidebar',this.value,'--sidebar-bg')" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Color principal / botones</label>
+          <div class="color-picker-wrap">
+            <input type="color" id="cfg-brand" oninput="liveColor('--brand',this.value);liveColor('--brand-hover',shadeColor(this.value,-15))" />
+            <input type="text" class="form-control" id="cfg-brand-hex" style="width:90px" oninput="syncHex('cfg-brand',this.value,'--brand')" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Color tarjetas / superficie</label>
+          <div class="color-picker-wrap">
+            <input type="color" id="cfg-surface" oninput="liveColor('--surface',this.value)" />
+            <input type="text" class="form-control" id="cfg-surface-hex" style="width:90px" oninput="syncHex('cfg-surface',this.value,'--surface')" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Color texto principal</label>
+          <div class="color-picker-wrap">
+            <input type="color" id="cfg-text" oninput="liveColor('--text',this.value)" />
+            <input type="text" class="form-control" id="cfg-text-hex" style="width:90px" oninput="syncHex('cfg-text',this.value,'--text')" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Color borde</label>
+          <div class="color-picker-wrap">
+            <input type="color" id="cfg-border" oninput="liveColor('--border',this.value)" />
+            <input type="text" class="form-control" id="cfg-border-hex" style="width:90px" oninput="syncHex('cfg-border',this.value,'--border')" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Colores de estado de incidencias -->
+    <div class="config-card" style="grid-column:1/-1">
+      <div class="config-card-title">🚦 Colores de estado de incidencias</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">
+        <div>
+          <div style="font-size:13px;font-weight:500;margin-bottom:10px;color:var(--text2)">Estado: Abierta</div>
+          <div class="form-group">
+            <label class="form-label">Fondo</label>
+            <div class="color-picker-wrap">
+              <input type="color" id="cfg-open-bg" oninput="liveColor('--badge-open-bg',this.value+'26')" />
+              <input type="text" class="form-control" id="cfg-open-bg-hex" style="width:90px" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Texto</label>
+            <div class="color-picker-wrap">
+              <input type="color" id="cfg-open-text" oninput="liveColor('--badge-open-text',this.value)" />
+              <input type="text" class="form-control" id="cfg-open-text-hex" style="width:90px" />
+            </div>
+          </div>
+          <div style="margin-top:8px"><span class="badge badge-open"><span class="badge-dot"></span>Abierta</span></div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:500;margin-bottom:10px;color:var(--text2)">Estado: En progreso</div>
+          <div class="form-group">
+            <label class="form-label">Fondo</label>
+            <div class="color-picker-wrap">
+              <input type="color" id="cfg-prog-bg" oninput="liveColor('--badge-prog-bg',this.value+'26')" />
+              <input type="text" class="form-control" id="cfg-prog-bg-hex" style="width:90px" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Texto</label>
+            <div class="color-picker-wrap">
+              <input type="color" id="cfg-prog-text" oninput="liveColor('--badge-prog-text',this.value)" />
+              <input type="text" class="form-control" id="cfg-prog-text-hex" style="width:90px" />
+            </div>
+          </div>
+          <div style="margin-top:8px"><span class="badge badge-in_progress"><span class="badge-dot"></span>En progreso</span></div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:500;margin-bottom:10px;color:var(--text2)">Estado: Cerrada</div>
+          <div class="form-group">
+            <label class="form-label">Fondo</label>
+            <div class="color-picker-wrap">
+              <input type="color" id="cfg-closed-bg" oninput="liveColor('--badge-closed-bg',this.value+'26')" />
+              <input type="text" class="form-control" id="cfg-closed-bg-hex" style="width:90px" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Texto</label>
+            <div class="color-picker-wrap">
+              <input type="color" id="cfg-closed-text" oninput="liveColor('--badge-closed-text',this.value)" />
+              <input type="text" class="form-control" id="cfg-closed-text-hex" style="width:90px" />
+            </div>
+          </div>
+          <div style="margin-top:8px"><span class="badge badge-closed"><span class="badge-dot"></span>Cerrada</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div style="margin-top:1.25rem;display:flex;gap:10px">
+    <button class="btn btn-primary" onclick="saveConfig()">💾 Guardar todos los cambios</button>
+    <button class="btn btn-secondary" onclick="resetColors()">↺ Restaurar colores por defecto</button>
+  </div>
+</div>

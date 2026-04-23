@@ -1,0 +1,29 @@
+<div id="page-agencies" class="page">
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Agencias y transportistas</span>
+      <div class="card-actions">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="form-control" id="ag-search" placeholder="Buscar..." oninput="renderAgencies()" />
+        </div>
+        <button class="btn btn-primary btn-sm admin-action" onclick="openAgencyModal()">+ Nueva agencia</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Contacto</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th>Incid.</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="ag-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,99 @@
+<div class="modal-overlay" id="m-incident">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <span class="modal-title" id="m-incident-title">Nueva incidencia</span>
+      <button class="modal-close" onclick="closeModal('m-incident')">✕</button>
+    </div>
+    <div id="m-incident-alert"></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Agencia / Transportista *</label>
+        <select class="form-control" id="i-agency"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nº de albarán *</label>
+        <input type="text" class="form-control" id="i-albaran" placeholder="ALB-2024-001" maxlength="50" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Tipo de incidencia *</label>
+        <select class="form-control" id="i-type"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo de envío</label>
+        <select class="form-control" id="i-shiptype">
+          <option value="">Seleccionar...</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Zona geográfica *</label>
+        <select class="form-control" id="i-zone"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Población *</label>
+        <div class="autocomplete-wrap">
+          <input type="text" class="form-control" id="i-city" placeholder="Escribe una población..." autocomplete="off"
+            oninput="citySearch(this.value)" onkeydown="cityKey(event)" onfocus="citySearch(this.value)" />
+          <div class="autocomplete-dropdown" id="city-dropdown"></div>
+        </div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Código postal</label>
+        <input type="text" class="form-control" id="i-postal" placeholder="08001" maxlength="10" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cliente</label>
+        <input type="text" class="form-control" id="i-client" placeholder="Nombre del cliente" maxlength="100" />
+      </div>
+    </div>
+    <div class="form-row-3">
+      <div class="form-group">
+        <label class="form-label">Fecha de envío</label>
+        <input type="date" class="form-control" id="i-ship-date" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fecha de entrega</label>
+        <input type="date" class="form-control" id="i-rec-date" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fecha de incidencia *</label>
+        <input type="date" class="form-control" id="i-inc-date" />
+      </div>
+    </div>
+    <div class="form-group" id="i-first-note-group">
+      <label class="form-label">Incidencia *</label>
+      <textarea class="form-control" id="i-first-note" maxlength="2000"
+        placeholder="Describe la incidencia ocurrida..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descripción mercancía</label>
+      <textarea class="form-control" id="i-desc" maxlength="2000"
+        placeholder="Describe el material que se estaba transportando con el máximo detalle posible..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('m-incident')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveIncident()">Guardar incidencia</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-detail">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <span class="modal-title" id="m-detail-title">Detalle de incidencia</span>
+      <button class="modal-close" onclick="closeModal('m-detail')">✕</button>
+    </div>
+    <div id="m-detail-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('m-detail')">Cerrar</button>
+      <button class="btn btn-warning btn-sm" id="btn-set-progress" onclick="setStatus('in_progress')">🔄 En
+        progreso</button>
+      <button class="btn btn-success btn-sm" id="btn-set-closed" onclick="setStatus('closed')">✓ Resolver</button>
+    </div>
+  </div>
+</div>

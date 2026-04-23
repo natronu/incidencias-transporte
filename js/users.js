@@ -98,21 +98,11 @@ async function saveUser() {
   const changingPass = isEdit ? document.getElementById('u-change-pass').checked : true;
 
   // Validations
-  if (!name) {
-    alertEl.innerHTML = '<div class="alert alert-error">⚠️ El nombre es obligatorio</div>'; return;
-  }
-  if (!isEdit && !username) {
-    alertEl.innerHTML = '<div class="alert alert-error">⚠️ El nombre de usuario es obligatorio</div>'; return;
-  }
-  if (!isEdit && !pass) {
-    alertEl.innerHTML = '<div class="alert alert-error">⚠️ La contraseña es obligatoria</div>'; return;
-  }
-  if (changingPass && pass && pass !== pass2) {
-    alertEl.innerHTML = '<div class="alert alert-error">⚠️ Las contraseñas no coinciden</div>'; return;
-  }
-  if (changingPass && pass && pass.length < 6) {
-    alertEl.innerHTML = '<div class="alert alert-error">⚠️ La contraseña debe tener al menos 6 caracteres</div>'; return;
-  }
+  if (!name) { showAlert(alertEl, 'El nombre es obligatorio'); return; }
+  if (!isEdit && !username) { showAlert(alertEl, 'El nombre de usuario es obligatorio'); return; }
+  if (!isEdit && !pass) { showAlert(alertEl, 'La contraseña es obligatoria'); return; }
+  if (changingPass && pass && pass !== pass2) { showAlert(alertEl, 'Las contraseñas no coinciden'); return; }
+  if (changingPass && pass && pass.length < 6) { showAlert(alertEl, 'La contraseña debe tener al menos 6 caracteres'); return; }
 
   showLoad(isEdit ? 'Actualizando usuario...' : 'Creando usuario...');
   try {

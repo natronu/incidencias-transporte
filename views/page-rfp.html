@@ -1,0 +1,44 @@
+<div id="page-rfp" class="page">
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Recogidas fuera de plaza (RFP)</span>
+      <div class="card-actions">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="form-control" id="rfp-search" placeholder="Buscar..." oninput="filterRFP()" />
+        </div>
+        <button class="btn btn-primary btn-sm write-action" onclick="openRFPModal()">+ Nueva RFP</button>
+      </div>
+    </div>
+    <div class="filters-bar">
+      <select class="form-control filter-select" id="rfp-filter-status" onchange="filterRFP()">
+        <option value="">Todos los estados</option>
+        <option value="open">Abierta</option>
+        <option value="in_progress">En progreso</option>
+        <option value="finished">Finalizada</option>
+      </select>
+    </div>
+    <div class="table-wrap">
+      <table id="rfp-table">
+        <thead>
+          <tr>
+            <th onclick="sortRFP('commercial_name')">Comercial <span class="sort-icon">↕</span></th>
+            <th onclick="sortRFP('order_number')">Nº Pedido / Albarán <span class="sort-icon">↕</span></th>
+            <th onclick="sortRFP('client_name')">Cliente <span class="sort-icon">↕</span></th>
+            <th onclick="sortRFP('agency_name')">Agencia <span class="sort-icon">↕</span></th>
+            <th onclick="sortRFP('zone_name')">Zona <span class="sort-icon">↕</span></th>
+            <th onclick="sortRFP('pickup_date')">F. Solicitud <span class="sort-icon">↕</span></th>
+            <th onclick="sortRFP('tracking_number')">Nº Seguimiento <span class="sort-icon">↕</span></th>
+            <th onclick="sortRFP('status')">Estado <span class="sort-icon">↕</span></th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="rfp-tbody"></tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <div class="pagination-info" id="rfp-pag-info">—</div>
+      <div class="pagination-controls" id="rfp-pag-controls"></div>
+    </div>
+  </div>
+</div>

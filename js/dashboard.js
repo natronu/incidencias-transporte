@@ -2,11 +2,12 @@
 // DASHBOARD.JS — dashboard
 // ================================================================
 
+
 async function loadDashboard() {
   showLoad();
   try {
     const [inc, ag] = await Promise.all([
-      sb.query('incidents', '?select=status'),
+      sb.query('incidents', '?select=status&status=neq.deleted'),
       sb.query('agencies', '?select=id&active=eq.true')
     ]);
     const open = inc.filter(i => i.status === 'open').length;
@@ -18,7 +19,7 @@ async function loadDashboard() {
     document.getElementById('d-agencies').textContent = ag.length;
     document.getElementById('badge-open').textContent = open + prog;
 
-    const recent = await sb.query('incidents', '?select=incident_code,albaran,status,shipment_date,reception_date,incident_date,agency_id,incident_type_id,agencies(name),incident_types(name)&order=created_at.desc&limit=8');
+    const recent = await sb.query('incidents', '?select=incident_code,albaran,status,shipment_date,reception_date,incident_date,agency_id,incident_type_id,agencies(name),incident_types(name)&status=neq.deleted&order=created_at.desc&limit=8');
     const tbody = document.getElementById('dash-tbody');
     tbody.innerHTML = recent.length ? recent.map(i => `<tr>
       <td>${escapeHtml(i.agencies?.name)}</td>
