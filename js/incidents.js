@@ -389,7 +389,7 @@ async function setStatus(status) {
   try {
     const oldInc = allIncidents.find(i => i.id === id) || {};
     await sb.update('incidents', id, { status, updated_at: new Date().toISOString() });
-    try { await sb.insert('incident_logs', { incident_id: id, user_id: currentUser.id, user_name: currentUser.name, action: 'MODIFICAR', incident_data: { status }, previous_data: { status: oldInc.status } }); } catch(e) { console.warn(e); }
+    try { await sb.insert('incident_logs', { incident_id: id, user_id: currentUser.id, user_name: currentUser.name, action: 'MODIFICAR', incident_data: { albaran: oldInc.albaran, status }, previous_data: { albaran: oldInc.albaran, status: oldInc.status } }); } catch(e) { console.warn(e); }
     toast('Estado actualizado');
     closeModal('m-detail');
     allIncidents = [];
