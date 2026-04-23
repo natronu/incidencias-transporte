@@ -41,5 +41,14 @@
         });
         if (!r.ok) { const e = await r.json(); throw new Error(e.message || r.statusText); }
         return true;
+      },
+      async count(table, params = '') {
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}${params}`, {
+          method: 'HEAD',
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${getAuthToken()}`, 'Prefer': 'count=exact' }
+        });
+        if (!r.ok) throw new Error(r.statusText);
+        const range = r.headers.get('Content-Range');
+        return range ? parseInt(range.split('/')[1], 10) : 0;
       }
     };

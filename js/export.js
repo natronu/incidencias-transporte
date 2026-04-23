@@ -4,9 +4,21 @@
 
 async function exportExcel() {
   if (!filteredIncidents.length) { toast('No hay incidencias para exportar', 'error'); return; }
-  showLoad('Generando informe Excel corporativo...');
+  showLoad('Cargando módulo de exportación...');
 
   try {
+    if (typeof XLSX === 'undefined') {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js';
+        script.onload = resolve;
+        script.onerror = () => reject(new Error('No se pudo cargar la librería Excel'));
+        document.head.appendChild(script);
+      });
+    }
+    
+    showLoad('Generando informe Excel corporativo...');
+
     // ── Fetch all updates for visible incidents in one query ──
     const ids = filteredIncidents.map(i => i.id).join(',');
     let allUpdates = [];
