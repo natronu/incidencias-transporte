@@ -32,7 +32,8 @@ function filterLogs() {
   filteredLogs = allLogs.filter(l => {
     if (action && l.action !== action) return false;
     if (q) {
-      const hay = [l.user_name, l.action].join(' ').toLowerCase();
+      const albaran = (l.incident_data?.albaran || l.previous_data?.albaran || '').toLowerCase();
+      const hay = [l.user_name, l.action, albaran].join(' ').toLowerCase();
       if (!hay.includes(q)) return false;
     }
     return true;
@@ -64,15 +65,16 @@ function renderLogs() {
     // Si la incidencia sigue existiendo, intentamos mostrar su código (del json), o solo el ID
     const incData = l.incident_data || {};
     const prevData = l.previous_data || {};
-    const incLabel = incData.incident_code || prevData.incident_code || `ID: ${l.incident_id || 'Desconocido'}`;
+    const incLabel = incData.albaran || prevData.albaran || '—';
 
     return `<tr>
       <td>${fmtDateTime(l.created_at)}</td>
       <td><span style="font-weight:500;color:var(--text)">${escapeHtml(l.user_name || 'Sistema')}</span></td>
       <td>${getActionBadge(l.action)}</td>
       <td><span class="text-mono" style="color:var(--brand)">${escapeHtml(incLabel)}</span></td>
-      <td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-secondary btn-sm" onclick="viewLogDetail(${l.id})">Ver Diferencias</button>
+        ${isAdmin() ? `<button class="btn btn-sm" style="background:rgba(239,68,68,0.1);color:#b91c1c;border:1px solid rgba(239,68,68,0.2)" onclick="deleteLog(${l.id})">Eliminar</button>` : ''}
       </td>
     </tr>`;
   }).join('') : `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📝</div><div class="empty-title">Sin registros</div><div class="empty-desc">No se encontraron registros de auditoría</div></div></td></tr>`;
@@ -143,18 +145,20 @@ function renderLogChanges(prev, current, action) {
   const allKeys = new Set([...Object.keys(prev), ...Object.keys(current)]);
   let rows = '';
 
-  const ignoreKeys = ['id', 'created_at', 'updated_at', 'created_by', 'agency_name', 'incident_type_name', 'incident_type_color', 'zone_name', 'shipment_type_name', 'shipment_type'];
+  const ignoreKeys = ['id', 'created_at', 'updated_at', 'created_by', 'incident_code', 'agency_name', 'incident_type_name', 'incident_type_color', 'zone_name', 'shipment_type_name', 'shipment_type'];
+  const norm = v => (v === null || v === undefined || v === '') ? null : v;
 
   for (let k of allKeys) {
     if (ignoreKeys.includes(k)) continue;
-    
+    if (!(k in current)) continue;
+
     const oldV = prev[k], newV = current[k];
-    
+
     // Ignorar objetos anidados que vienen de los JOIN de Supabase (ej. agencies: {name: ...})
     if (typeof oldV === 'object' && oldV !== null && !Array.isArray(oldV)) continue;
     if (typeof newV === 'object' && newV !== null && !Array.isArray(newV)) continue;
-    
-    if (JSON.stringify(oldV) !== JSON.stringify(newV)) {
+
+    if (JSON.stringify(norm(oldV)) !== JSON.stringify(norm(newV))) {
       const label = FIELD_DICT[k] || k.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()); // Fallback a formato legible si no está en el dict
       rows += `
         <tr style="border-bottom:1px solid var(--border)">
@@ -186,15 +190,30 @@ function viewLogDetail(id) {
 
   const incData = log.incident_data || {};
   const prevData = log.previous_data || {};
-  const incLabel = incData.incident_code || prevData.incident_code || `ID: ${log.incident_id || 'Desconocido'}`;
+  const incLabel = incData.albaran || prevData.albaran || '—';
 
   document.getElementById('m-log-metadata').innerHTML = `
     ${df('Fecha y Hora', fmtDateTime(log.created_at))}
     ${df('Usuario', escapeHtml(log.user_name))}
     ${df('Acción', getActionBadge(log.action))}
-    ${df('Incidencia', escapeHtml(incLabel))}
+    ${df('Albarán', escapeHtml(incLabel))}
   `;
 
   document.getElementById('m-log-changes').innerHTML = renderLogChanges(prevData, incData, log.action);
   openModal('m-log-detail');
+}
+
+async function deleteLog(id) {
+  if (!isAdmin()) return;
+  if (!confirm('¿Eliminar este registro de auditoría? Esta acción no se puede deshacer.')) return;
+  showLoad('Eliminando registro...');
+  try {
+    await sb.delete('incident_logs', id);
+    allLogs = allLogs.filter(l => l.id !== id);
+    filterLogs();
+    toast('Registro eliminado');
+  } catch (e) {
+    toast('Error al eliminar: ' + e.message, 'error');
+  }
+  hideLoad();
 }

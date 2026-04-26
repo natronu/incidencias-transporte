@@ -24,12 +24,11 @@ async function citySearch(q) {
     try {
       const params = new URLSearchParams({
         q: q,
-        countrycodes: 'es',
+        countrycodes: 'es,pt',
         format: 'json',
         limit: 15,
         addressdetails: 1,
-        'accept-language': 'es',
-        featuretype: 'settlement'
+        'accept-language': 'es'
       });
       const res = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
         signal: cityAbortController.signal,
@@ -38,12 +37,16 @@ async function citySearch(q) {
       if (!res.ok) throw new Error('Error de red');
       const data = await res.json();
 
+      const countryFlag = code => code.toUpperCase().replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt(0)));
+
       const seen = new Set();
       const results = data
+        .filter(r => r.class === 'place' || r.class === 'boundary')
         .map(r => {
           const name = r.name || r.address?.city || r.address?.town || r.address?.village || '';
           const region = r.address?.state || r.address?.province || r.address?.county || '';
-          return { name, region };
+          const flag = countryFlag(r.address?.country_code || 'es');
+          return { name, region, flag };
         })
         .filter(r => {
           if (!r.name || seen.has(r.name)) return false;
@@ -55,14 +58,13 @@ async function citySearch(q) {
       cityHighlightIdx = -1;
 
       if (!results.length) {
-        dd.innerHTML = '<div class="autocomplete-item autocomplete-loading">Sin resultados para España</div>';
+        dd.innerHTML = '<div class="autocomplete-item autocomplete-loading">Sin resultados para España o Portugal</div>';
         return;
       }
-
       dd.innerHTML = results.map((r, i) =>
         `<div class="autocomplete-item" data-idx="${i}" data-name="${escapeHtml(r.name)}"
-          onmousedown="selectCity('${r.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">
-          <span class="autocomplete-flag">🇪🇸</span>
+          onmousedown="selectCity('${r.name.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}')">
+          <span class="autocomplete-flag">${r.flag}</span>
           <span>${escapeHtml(r.name)}</span>
           <span class="autocomplete-region">${escapeHtml(r.region)}</span>
         </div>`
