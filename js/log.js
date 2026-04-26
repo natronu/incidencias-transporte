@@ -72,8 +72,9 @@ function renderLogs() {
       <td><span style="font-weight:500;color:var(--text)">${escapeHtml(l.user_name || 'Sistema')}</span></td>
       <td>${getActionBadge(l.action)}</td>
       <td><span class="text-mono" style="color:var(--brand)">${escapeHtml(incLabel)}</span></td>
-      <td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-secondary btn-sm" onclick="viewLogDetail(${l.id})">Ver Diferencias</button>
+        ${isAdmin() ? `<button class="btn btn-sm" style="background:rgba(239,68,68,0.1);color:#b91c1c;border:1px solid rgba(239,68,68,0.2)" onclick="deleteLog(${l.id})">Eliminar</button>` : ''}
       </td>
     </tr>`;
   }).join('') : `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📝</div><div class="empty-title">Sin registros</div><div class="empty-desc">No se encontraron registros de auditoría</div></div></td></tr>`;
@@ -200,4 +201,19 @@ function viewLogDetail(id) {
 
   document.getElementById('m-log-changes').innerHTML = renderLogChanges(prevData, incData, log.action);
   openModal('m-log-detail');
+}
+
+async function deleteLog(id) {
+  if (!isAdmin()) return;
+  if (!confirm('¿Eliminar este registro de auditoría? Esta acción no se puede deshacer.')) return;
+  showLoad('Eliminando registro...');
+  try {
+    await sb.delete('incident_logs', id);
+    allLogs = allLogs.filter(l => l.id !== id);
+    filterLogs();
+    toast('Registro eliminado');
+  } catch (e) {
+    toast('Error al eliminar: ' + e.message, 'error');
+  }
+  hideLoad();
 }
